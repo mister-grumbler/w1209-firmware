@@ -1,4 +1,4 @@
-/*
+/**
  * Control functions for analog-to-digital converter (ADC).
  */
 
@@ -7,8 +7,8 @@
 static unsigned int result;
 static unsigned long averaged;
 
-/*
- * Initialize ADC's configuration registers 
+/**
+ * @brief Initialize ADC's configuration registers.
  */
 void initADC() {
     ADC_CR1 |= 0x70;    // Prescaler f/18 (SPSEL)
@@ -19,21 +19,33 @@ void initADC() {
     averaged = 0;
 }
 
+/**
+ * @brief Sets bit in ADC control register to start data convertion.
+ */
 void startADC() {
     ADC_CR1 |= 0x01;
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 unsigned int getAdcResult() {
     return result;
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 unsigned int getAdcAveraged() {
     return (unsigned int)(averaged >> ADC_AVERAGING_BITS);
 }
 
 /**
- * This function is interrupt request handler
- * so keep it extremely small and fast.
+ * @brief This function is ADC's interrupt request handler
+ *  so keep it extremely small and fast.
+ * @return 
  */
 void ADC1_EOC_handler() __interrupt(22) {
     result = ADC_DRH << 2;

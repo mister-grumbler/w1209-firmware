@@ -169,8 +169,10 @@ unsigned int getAdcAveraged();
 void ADC1_EOC_handler() __interrupt(22);
 
 void initParamsEEPROM();
-signed char getParam(unsigned char);
-void setParam(unsigned char, signed char);
+signed char getParamById(unsigned char);
+void setParamById(unsigned char, signed char);
+signed char getParam();
+void setParam(signed char);
 void incParam();
 void decParam();
 unsigned char getParamId();

@@ -19,7 +19,7 @@ static bool displayOff;
 static bool testMode;
 
 /**
- * Configure appropriate bits for GPIO ports
+ * @brief Configure appropriate bits for GPIO ports
  * and set test/welcome message on display.
  */
 void initIndicator() {
@@ -38,7 +38,7 @@ void initIndicator() {
 }
 
 /**
- * This function is being called during interrupt request
+ * @brief This function is being called during interrupt request
  * so keep it extremely small and fast.
  */
 void refreshDisplay() {
@@ -56,21 +56,35 @@ void refreshDisplay() {
     if (activeDigitId > 1) activeDigitId = 0; else activeDigitId++;
 }
 
+/**
+ * @brief 
+ * @param val
+ */
 void setDisplayTestMode(bool val) {
     testMode = val;
 }
 
+/**
+ * @brief 
+ * @param val
+ */
 void setDisplayOff(bool val) {
     displayOff = val;
 }
 
+/**
+ * @brief 
+ * @param id
+ * @param val
+ */
 void setDisplayDot(unsigned char id, bool val) {
     if (val) displayD[id] |= SSD_SEG_P_BIT;
     else displayD[id] &= ~SSD_SEG_P_BIT;
 }
 
 /**
- * Set symbols of given null-terminated string on display.
+ * @brief Set symbols of given null-terminated string on display.
+ * @param val
  */
 void setDisplayStr(const unsigned char* val){
     unsigned char i, d;
@@ -83,17 +97,29 @@ void setDisplayStr(const unsigned char* val){
     }
 }
 
+/**
+ * @brief 
+ * @param val
+ */
 void setDisplayUCharHex(unsigned char val){
     setDigit(0, Hex2CharMap[val & 0x0F], false);
     setDigit(1, Hex2CharMap[(val & 0xF0) >> 4], false);
 }
 
+/**
+ * @brief 
+ * @param val
+ */
 void setDisplayUIntHex(unsigned int val) {
     setDigit(0, Hex2CharMap[val & 0x000F], false);
     setDigit(1, Hex2CharMap[(val & 0x00F0) >> 4], false);
     setDigit(2, Hex2CharMap[(val & 0x0F00) >> 8], false);
 }
 
+/**
+ * @brief 
+ * @param val
+ */
 void setDisplayUInt(unsigned int val) {
     unsigned int output = 0;
     signed char a;
@@ -110,6 +136,10 @@ void setDisplayUInt(unsigned int val) {
     setDisplayUIntBCD(output);
 }
 
+/**
+ * @brief 
+ * @param val
+ */
 void setDisplayUChar(unsigned char val) {
     unsigned char tmp;
 
@@ -128,12 +158,20 @@ void setDisplayUChar(unsigned char val) {
     setDigit(0, Hex2CharMap[val], false);
 }
 
+/**
+ * @brief 
+ * @param val
+ */
 void setDisplayUCharBCD(unsigned char val) {
     setDigit(2, Hex2CharMap[0], false);
     setDigit(1, Hex2CharMap[(val & 0xF0) >> 4], false);
     setDigit(0, Hex2CharMap[val & 0xF], false);
 }
 
+/**
+ * @brief 
+ * @param val
+ */
 void setDisplayUIntBCD(unsigned int val) {
     setDigit(2, Hex2CharMap[(val & 0xF00) >> 8], false);
     setDigit(1, Hex2CharMap[(val & 0xF0) >> 4], false);

@@ -1,16 +1,19 @@
-/*
+/**
  * Control functions for timer.
  */
 
 #include "ts.h"
 
-/* Uptime counter
+/**
+ * Uptime counter
  * |--Day--|--Hour--|--Minute--|--Second--|--Ticks--|
  * 32      23       18         12         6         0
  */
 static unsigned long uptime;
 
-// Initialize timer's configuration registers
+/**
+ * @brief Initialize timer's configuration registers
+ */
 void initTimer() {
     TIM4_PSCR = 0x06;
     TIM4_IER = 0x01;    // Enable interrupt on update event
@@ -18,35 +21,58 @@ void initTimer() {
     resetUptime();
 }
 
+/**
+ * @brief 
+ */
 void resetUptime() {
     uptime = 0;
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 unsigned long getUptime() {
     return uptime;
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 unsigned char getUptimeSeconds() {
     return (unsigned char)((uptime >> 7) & 0x3F);
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 unsigned char getUptimeMinutes() {
     return (unsigned char)((uptime >> 13) & 0x3F);
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 unsigned char getUptimeHours() {
     return (unsigned char)((uptime >> 19) & 0x1F);
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 unsigned char getUptimeDays() {
     return (unsigned char)((uptime >> 24) & 0xFF);
 }
 
 /**
- * This function is interrupt request handler
+ * @brief This function is timer's interrupt request handler
  * so keep it extremely small and fast.
  */
- void TIM4_UPD_handler() __interrupt(23) {
+void TIM4_UPD_handler() __interrupt(23) {
     TIM4_SR &= ~TIM_SR1_UIF; // Reset flag
     uptime++;
     // Increment minutes count when 60 seconds have passed.

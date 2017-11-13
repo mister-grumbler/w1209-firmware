@@ -1,4 +1,4 @@
-/*
+/**
  * Control functions for buttons.
  */
 
@@ -7,6 +7,9 @@
 static unsigned char status;
 static unsigned char diff;
 
+/**
+ * @brief 
+ */
 void initButtons() {
     PC_CR1 |= BUTTON1_BIT | BUTTON2_BIT | BUTTON3_BIT;
     PC_CR2 |= BUTTON1_BIT | BUTTON2_BIT | BUTTON3_BIT;
@@ -15,26 +18,50 @@ void initButtons() {
     EXTI_CR1 |= 0x30;   // generate interrupt on falling and rising front.
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 unsigned char getButton() {
     return status;
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 unsigned char getButtonDiff() {
     return diff;
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 bool getButton1() {
     return status & BUTTON1_BIT;
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 bool getButton2() {
     return status & BUTTON2_BIT;
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 bool getButton3() {
     return status & BUTTON3_BIT;
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 bool isButton1() {
     if (diff & BUTTON1_BIT) {
         diff &= ~BUTTON1_BIT;
@@ -43,6 +70,10 @@ bool isButton1() {
     return false;
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 bool isButton2() {
     if (diff & BUTTON2_BIT) {
         diff &= ~BUTTON2_BIT;
@@ -51,6 +82,10 @@ bool isButton2() {
     return false;
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 bool isButton3() {
     if (diff & BUTTON3_BIT) {
         diff &= ~BUTTON3_BIT;
@@ -60,7 +95,7 @@ bool isButton3() {
 }
 
 /**
- * This function is interrupt request handler
+ * @brief This function is button's interrupt request handler
  * so keep it extremely small and fast.
  */
 void EXTI2_handler() __interrupt(5) {

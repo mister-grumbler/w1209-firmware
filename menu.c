@@ -12,17 +12,38 @@ static unsigned char menuDisplay;
 static unsigned char menuState;
 static unsigned int timer;
  
+/**
+ * @brief 
+ */
 void initMenu() {
     timer = 0;
     menuState = menuDisplay = MENU_ROOT;
 }
 
+/**
+ * @brief 
+ * @return 
+ */
 unsigned char getMenuDisplay() {
     return menuDisplay;
 }
 
 /**
- * Updating state of application's menu when new event is received.
+ * @brief Updating state of application's menu and displaying info when new
+ *  event is received. Possible states of menu and displaying are:
+ *  MENU_ROOT
+ *  MENU_SELECT_PARAM
+ *  MENU_CHANGE_PARAM
+ *  MENU_SET_THRESHOLD
+ * 
+ * @param event is one of:
+ *  MENU_EVENT_PUSH_BUTTON1
+ *  MENU_EVENT_PUSH_BUTTON2
+ *  MENU_EVENT_PUSH_BUTTON3
+ *  MENU_EVENT_RELEASE_BUTTON1
+ *  MENU_EVENT_RELEASE_BUTTON2
+ *  MENU_EVENT_RELEASE_BUTTON3
+ *  MENU_EVENT_CHECK_TIMER
  */
 void feedMenu(unsigned char event) {
     if (menuState == MENU_ROOT) {
@@ -40,7 +61,7 @@ void feedMenu(unsigned char event) {
             case MENU_EVENT_CHECK_TIMER:
                 if (getButton1()) {
                     timer++;
-                    if(timer > MENU_5_SEC_PASSED) {
+                    if(timer > MENU_3_SEC_PASSED) {
                         setParamId(0);
                         timer = 0;
                         menuState = menuDisplay = MENU_SELECT_PARAM;
@@ -66,29 +87,31 @@ void feedMenu(unsigned char event) {
                 timer = 0;
                 break;
             case MENU_EVENT_PUSH_BUTTON2:
-//        RELAY_PORT ^= RELAY_BIT; //toggle LED
                 incParamId();
+                timer = 0;
+                break;
+            case MENU_EVENT_RELEASE_BUTTON2:
                 timer = 0;
                 break;
             case MENU_EVENT_PUSH_BUTTON3:
                 decParamId();
                 timer = 0;
                 break;
+            case MENU_EVENT_RELEASE_BUTTON3:
+                timer = 0;
+                break;
             case MENU_EVENT_CHECK_TIMER:
                 timer++;
-                if (getButton1() && timer > MENU_3_SEC_PASSED) {
-                    timer = 0;
-                    menuState = menuDisplay = MENU_SELECT_PARAM;
-                    break;
-                }
                 if (timer > MENU_1_SEC_PASSED) {
-                    if (getButton2()) {
+                    if (getButton2() && (bool)(getUptime() & 0x40)) {
                         incParamId();
-                    } else if (getButton3()) {
+                        timer = MENU_1_SEC_PASSED;
+                    } else if (getButton3() && (bool)(getUptime() & 0x40)) {
                         decParamId();
+                        timer = MENU_1_SEC_PASSED;
                     }
-                } else if (timer > MENU_5_SEC_PASSED) {
-        RELAY_PORT ^= RELAY_BIT; //toggle LED
+                }
+                if (timer > MENU_5_SEC_PASSED) {
                     timer = 0;
                     setParamId(0);
                     menuState = menuDisplay = MENU_ROOT;
@@ -103,6 +126,7 @@ void feedMenu(unsigned char event) {
         switch(event) {
             case MENU_EVENT_PUSH_BUTTON1:
                 timer = 0;
+                menuState = menuDisplay = MENU_SELECT_PARAM;
                 break;
             case MENU_EVENT_PUSH_BUTTON2:
                 incParam();
@@ -114,6 +138,11 @@ void feedMenu(unsigned char event) {
                 break;
             case MENU_EVENT_CHECK_TIMER:
                 timer++;
+                if (getButton1() && timer > MENU_3_SEC_PASSED) {
+                    timer = 0;
+                    menuState = menuDisplay = MENU_SELECT_PARAM;
+                    break;
+                }
                 if (timer > MENU_5_SEC_PASSED) {
                     timer = 0;
                     menuState = menuDisplay = MENU_ROOT;
@@ -137,6 +166,7 @@ void feedMenu(unsigned char event) {
                 timer = 0;
                 break;
             case MENU_EVENT_PUSH_BUTTON2:
+//        RELAY_PORT ^= RELAY_BIT; //toggle LED
                 setParamId(EEPROM_PARAM_THRESHOLD);
                 incParam();
                 timer = 0;
