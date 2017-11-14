@@ -46,7 +46,7 @@ unsigned int uInt2BCD(unsigned int val) {
  * @brief 
  */
 int main() {
-    int d,c;
+    int d;
     unsigned char param = 0;
     gpioInit();
     initParamsEEPROM();
@@ -77,10 +77,7 @@ int main() {
             setDisplayStr(errMsg);
             setDisplayOff((bool)(getUptime() & 0x40));
         }
-        for(c = 0; c<10; c++)
-        {
-            for(d = 0; d<9900; d++);
-        }
+        for(d = 0; d<9900; d++);
         WAIT_FOR_INTERRUPT
     } while(true);
 
