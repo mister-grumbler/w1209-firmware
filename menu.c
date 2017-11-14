@@ -4,8 +4,11 @@
 
 #include "ts.h"
 
-#define MENU_1_SEC_PASSED   17
-#define MENU_3_SEC_PASSED   50
+// TODO: these values should be corrected afterwards
+// to correspond more precise to given time intervals.
+#define MENU_AUTOINC_DELAY  3
+#define MENU_1_SEC_PASSED   15
+#define MENU_3_SEC_PASSED   45
 #define MENU_5_SEC_PASSED   90
  
 static unsigned char menuDisplay;
@@ -13,7 +16,7 @@ static unsigned char menuState;
 static unsigned int timer;
  
 /**
- * @brief 
+ * @brief Initialization of local variables.
  */
 void initMenu() {
     timer = 0;
@@ -21,7 +24,7 @@ void initMenu() {
 }
 
 /**
- * @brief 
+ * @brief Gets menu state for displaying appropriate value on the SSD.
  * @return 
  */
 unsigned char getMenuDisplay() {
@@ -60,7 +63,6 @@ void feedMenu(unsigned char event) {
                 break;
             case MENU_EVENT_CHECK_TIMER:
                 if (getButton1()) {
-                    timer++;
                     if(timer > MENU_3_SEC_PASSED) {
                         setParamId(0);
                         timer = 0;
@@ -80,33 +82,26 @@ void feedMenu(unsigned char event) {
         // store on timeout and return to MENU_ROOT
         switch(event) {
             case MENU_EVENT_PUSH_BUTTON1:
-                timer = 0;
                 menuState = menuDisplay = MENU_CHANGE_PARAM;
-                break;
             case MENU_EVENT_RELEASE_BUTTON1:
                 timer = 0;
                 break;
             case MENU_EVENT_PUSH_BUTTON2:
                 incParamId();
-                timer = 0;
-                break;
             case MENU_EVENT_RELEASE_BUTTON2:
                 timer = 0;
                 break;
             case MENU_EVENT_PUSH_BUTTON3:
                 decParamId();
-                timer = 0;
-                break;
             case MENU_EVENT_RELEASE_BUTTON3:
                 timer = 0;
                 break;
             case MENU_EVENT_CHECK_TIMER:
-                timer++;
-                if (timer > MENU_1_SEC_PASSED) {
-                    if (getButton2() && (bool)(getUptime() & 0x40)) {
+                if (timer > MENU_1_SEC_PASSED + MENU_AUTOINC_DELAY) {
+                    if (getButton2()) {
                         incParamId();
                         timer = MENU_1_SEC_PASSED;
-                    } else if (getButton3() && (bool)(getUptime() & 0x40)) {
+                    } else if (getButton3()) {
                         decParamId();
                         timer = MENU_1_SEC_PASSED;
                     }
@@ -125,19 +120,30 @@ void feedMenu(unsigned char event) {
         // store on timeout and return to MENU_ROOT
         switch(event) {
             case MENU_EVENT_PUSH_BUTTON1:
-                timer = 0;
                 menuState = menuDisplay = MENU_SELECT_PARAM;
+            case MENU_EVENT_RELEASE_BUTTON1:
+                timer = 0;
                 break;
             case MENU_EVENT_PUSH_BUTTON2:
                 incParam();
+            case MENU_EVENT_RELEASE_BUTTON2:
                 timer = 0;
                 break;
             case MENU_EVENT_PUSH_BUTTON3:
                 decParam();
+            case MENU_EVENT_RELEASE_BUTTON3:
                 timer = 0;
                 break;
             case MENU_EVENT_CHECK_TIMER:
-                timer++;
+                if (timer > MENU_1_SEC_PASSED + MENU_AUTOINC_DELAY) {
+                    if (getButton2()) {
+                        incParam();
+                        timer = MENU_1_SEC_PASSED;
+                    } else if (getButton3()) {
+                        decParam();
+                        timer = MENU_1_SEC_PASSED;
+                    }
+                }
                 if (getButton1() && timer > MENU_3_SEC_PASSED) {
                     timer = 0;
                     menuState = menuDisplay = MENU_SELECT_PARAM;
@@ -166,24 +172,24 @@ void feedMenu(unsigned char event) {
                 timer = 0;
                 break;
             case MENU_EVENT_PUSH_BUTTON2:
-//        RELAY_PORT ^= RELAY_BIT; //toggle LED
                 setParamId(EEPROM_PARAM_THRESHOLD);
                 incParam();
+            case MENU_EVENT_RELEASE_BUTTON2:
                 timer = 0;
                 break;
             case MENU_EVENT_PUSH_BUTTON3:
                 setParamId(EEPROM_PARAM_THRESHOLD);
                 decParam();
+            case MENU_EVENT_RELEASE_BUTTON3:
                 timer = 0;
                 break;
             case MENU_EVENT_CHECK_TIMER:
-                timer++;
-                if (getButton1() && timer > MENU_5_SEC_PASSED) {
-                    timer = 0;
-                    menuState = menuDisplay = MENU_SELECT_PARAM;
-                }
                 if (timer > MENU_5_SEC_PASSED) {
                     timer = 0;
+                    if (getButton1()) {
+                        menuState = menuDisplay = MENU_SELECT_PARAM;
+                        break;
+                    }
                     menuState = menuDisplay = MENU_ROOT;
                 }
                 break;
@@ -193,6 +199,15 @@ void feedMenu(unsigned char event) {
     }
 }
  
+/**
+ * @brief This function is being called during timer's interrupt
+ *  request so keep it extremely small and fast.
+ *  During this call all time-related functionality of application
+ *  menu is handled. For example: fast value change while holding
+ *  a button, return to root menu when no action is received from
+ *  user within a given time.
+ */
 void refreshMenu() {
+    timer++;
     feedMenu(MENU_EVENT_CHECK_TIMER);
 }
