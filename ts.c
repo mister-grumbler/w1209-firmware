@@ -1,7 +1,5 @@
 #include "ts.h"
 
-const unsigned char* errMsg = "ERR";
-unsigned char paramMsg[] = {' ','P','0',0};
 
 /**
  * @brief TODO: move this functionality into appropriate place.
@@ -19,35 +17,14 @@ void gpioInit(void) {
 }
 
 /**
- * @brief Converts integer value to BCD format.
- * Used to prepare a value to be shown on SSDisplay.
- * TODO: this function should be moved somewhere else.
- * @param val
- *  The value to be converted
- * @return value in BCD format.
- */
-unsigned int uInt2BCD(unsigned int val) {
-    unsigned int result = 0;
-    signed char a;
-
-    for(a = 13; a >= 0; a--){
-        if((result & 0xF) >= 5)
-            result += 3;
-        if(((result & 0xF0) >> 4) >= 5)
-            result += (3 << 4);
-        if(((result & 0xF00) >> 8) >= 5)
-            result += (3 << 8);
-        result = (result << 1) | ((val >> a) & 1);
-    }
-    return result;
-}
-
-/**
  * @brief 
  */
 int main() {
-    int d;
+    const unsigned char* errMsg = "ERR";
+    unsigned char paramMsg[] = {' ','P','0',0};
     unsigned char param = 0;
+    int d;
+
     gpioInit();
     initParamsEEPROM();
     initIndicator();
@@ -71,7 +48,7 @@ int main() {
             setDisplayStr((unsigned char*)&paramMsg);
             setDisplayOff(false);
         } else if (getMenuDisplay() == MENU_CHANGE_PARAM) {
-            setDisplayUCharHex(getParam());
+            setDisplayUInt(getParam());
             setDisplayOff(false);
         } else {
             setDisplayStr(errMsg);
