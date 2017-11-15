@@ -1,12 +1,10 @@
 /**
  * Control functions for the seven-segment display (SSD).
- * 
  */
 
 #include "ts.h"
 
 const unsigned char Hex2CharMap[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-const unsigned char* tstMsg = "8.8.8.\0";
 
 unsigned char activeDigitId;
 unsigned char displayAC[3];
@@ -19,8 +17,8 @@ static bool displayOff;
 static bool testMode;
 
 /**
- * @brief Configure appropriate bits for GPIO ports
- * and set test/welcome message on display.
+ * @brief Configure appropriate bits for GPIO ports, initialize static
+ *  variables and set test mode for display.
  */
 void initIndicator() {
     PA_DDR |= SSD_SEG_B_BIT | SSD_SEG_F_BIT;
@@ -31,15 +29,16 @@ void initIndicator() {
     PC_CR1 |= SSD_SEG_C_BIT | SSD_SEG_G_BIT;
     PD_DDR |= SSD_SEG_A_BIT | SSD_SEG_D_BIT | SSD_SEG_E_BIT | SSD_SEG_P_BIT | SSD_DIGIT_3_BIT;
     PD_CR1 |= SSD_SEG_A_BIT | SSD_SEG_D_BIT | SSD_SEG_E_BIT | SSD_SEG_P_BIT | SSD_DIGIT_3_BIT;
-    activeDigitId = 0;
-    setDisplayStr(tstMsg);
     displayOff= false;
-    testMode = true;
+    activeDigitId = 0;
+    setDisplayTestMode(true);
 }
 
 /**
- * @brief This function is being called during interrupt request
- * so keep it extremely small and fast.
+ * @brief This function is being called during timer's interrupt
+ *  request so keep it extremely small and fast. During this call
+ *  the data from display's buffer being used to drive appropriate
+ *  GPIO pins of microcontroller.
  */
 void refreshDisplay() {
     if (displayOff) {
@@ -53,20 +52,31 @@ void refreshDisplay() {
     SSD_SEG_AEDP_PORT &= ~SSD_AEDP_PORT_MASK;
     SSD_SEG_AEDP_PORT |= displayD[activeDigitId];
     enableDigit(activeDigitId);
-    if (activeDigitId > 1) activeDigitId = 0; else activeDigitId++;
+    if (activeDigitId > 1) {
+        activeDigitId = 0;
+    } else {
+        activeDigitId++;
+    }
 }
 
 /**
- * @brief 
- * @param val
+ * @brief Enables/disables a test mode of SSDisplay. While in this mode
+ *  the test message will be displayed and any attempts to update
+ *  display's buffer will be ignored.
+ * @param value to be set: true - enable test mode, false - disable test mode.
  */
 void setDisplayTestMode(bool val) {
+    const unsigned char* tstMsg = "8.8.8.";
+
+    if (!testMode && val) {
+        setDisplayStr(tstMsg);
+    }
     testMode = val;
 }
 
 /**
- * @brief 
- * @param val
+ * @brief Enable/disable display.
+ * @param value to be set: true - display off, false - display on.
  */
 void setDisplayOff(bool val) {
     displayOff = val;
@@ -78,12 +88,15 @@ void setDisplayOff(bool val) {
  * @param val
  */
 void setDisplayDot(unsigned char id, bool val) {
-    if (val) displayD[id] |= SSD_SEG_P_BIT;
-    else displayD[id] &= ~SSD_SEG_P_BIT;
+    if (val) {
+        displayD[id] |= SSD_SEG_P_BIT;
+    } else {
+        displayD[id] &= ~SSD_SEG_P_BIT;
+    }
 }
 
 /**
- * @brief Set symbols of given null-terminated string on display.
+ * @brief Sets symbols of given null-terminated string into display's buffer.
  * @param val
  */
 void setDisplayStr(const unsigned char* val){
@@ -92,8 +105,9 @@ void setDisplayStr(const unsigned char* val){
         if (*(val+i+1) == '.') {
             setDigit(d-1, *(val+i), true);
             i++;
+        } else {
+            setDigit(d-1, *(val+i), false);
         }
-        else setDigit(d-1, *(val+i), false);
     }
 }
 
@@ -124,12 +138,12 @@ void setDisplayUInt(unsigned int val) {
     unsigned int output = 0;
     signed char a;
 
-    for(a = 13; a >= 0; a--){
-        if((output & 0xF) >= 5)
+    for (a = 13; a >= 0; a--) {
+        if ((output & 0xF) >= 5)
             output += 3;
-        if(((output & 0xF0) >> 4) >= 5)
+        if (((output & 0xF0) >> 4) >= 5)
             output += (3 << 4);
-        if(((output & 0xF00) >> 8) >= 5)
+        if (((output & 0xF00) >> 8) >= 5)
             output += (3 << 8);
         output = (output << 1) | ((val >> a) & 1);
     }
@@ -147,13 +161,17 @@ void setDisplayUChar(unsigned char val) {
         tmp = val / 100;
         if (tmp > 0) setDigit(2, Hex2CharMap[tmp], false);
         val = val - (tmp * 100);
-    } else setDigit(2, Hex2CharMap[0], false);
+    } else {
+        setDigit(2, Hex2CharMap[0], false);
+    }
 
     if (val >= 10) {
         tmp = val / 10;
         if (tmp > 0) setDigit(1, Hex2CharMap[tmp], false);
         val = val - (tmp * 10);
-    } else setDigit(1, Hex2CharMap[0], false);
+    } else {
+        setDigit(1, Hex2CharMap[0], false);
+    }
 
     setDigit(0, Hex2CharMap[val], false);
 }
@@ -211,8 +229,9 @@ static void enableDigit(unsigned char id) {
 }
 
 /**
- * @brief
- *  Set given value to be shown on indicator.
+ * @brief Sets bits within display's buffer appropriate to given value.
+ *  So this symbol will be shown on indicator during refreshDisplay() call.
+ *  When test mode is enabled the display's buffer will not be updated.
  * 
  * The list of segments as they located on display:
  *  _2_       _1_       _0_
@@ -401,8 +420,11 @@ static void setDigit(unsigned char id, unsigned char val, bool dot) {
             displayD[id] = SSD_SEG_D_BIT;
     }
 
-    if (dot) displayD[id] |= SSD_SEG_P_BIT;
-    else displayD[id] &= ~SSD_SEG_P_BIT;
+    if (dot) {
+        displayD[id] |= SSD_SEG_P_BIT;
+    } else {
+        displayD[id] &= ~SSD_SEG_P_BIT;
+    }
 
     return;
 }
