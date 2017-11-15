@@ -22,47 +22,49 @@ void initTimer() {
 }
 
 /**
- * @brief 
+ * @brief Sets value of uptime counter to zero.
  */
 void resetUptime() {
     uptime = 0;
 }
 
 /**
- * @brief 
- * @return 
+ * @brief Gets raw value of bit-mapped uptime counter.
+ * |--Day--|--Hour--|--Minute--|--Second--|--Ticks--|
+ * 32      23       18         12         6         0
+ * @return value of uptime counter.
  */
 unsigned long getUptime() {
     return uptime;
 }
 
 /**
- * @brief 
- * @return 
+ * @brief Gets seconds part of time being passed since last reset.
+ * @return seconds part of uptime.
  */
 unsigned char getUptimeSeconds() {
     return (unsigned char)((uptime >> 7) & 0x3F);
 }
 
 /**
- * @brief 
- * @return 
+ * @brief Gets minutes part of time being passed since last reset.
+ * @return minutes part of uptime.
  */
 unsigned char getUptimeMinutes() {
     return (unsigned char)((uptime >> 13) & 0x3F);
 }
 
 /**
- * @brief 
- * @return 
+ * @brief Gets hours part of time being passed since last reset.
+ * @return hours part of uptime.
  */
 unsigned char getUptimeHours() {
     return (unsigned char)((uptime >> 19) & 0x1F);
 }
 
 /**
- * @brief 
- * @return 
+ * @brief Gets amount of days being passed since last reset.
+ * @return amount of days.
  */
 unsigned char getUptimeDays() {
     return (unsigned char)((uptime >> 24) & 0xFF);
@@ -91,6 +93,6 @@ void TIM4_UPD_handler() __interrupt(23) {
         uptime += (unsigned long)1 << 24;
     }
     refreshDisplay();
-    if (((unsigned char)uptime & 0x07) == 1) startADC();
-    if (((unsigned char)uptime & 0x07) == 2) refreshMenu();
+    if (((unsigned char)uptime & 0x07) == 1) refreshMenu();
+    if (((unsigned char)uptime & 0x3F) == 2) startADC();
 }
