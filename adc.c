@@ -27,16 +27,17 @@ void startADC() {
 }
 
 /**
- * @brief 
- * @return 
+ * @brief Gets raw result of last data conversion.
+ * @return raw result.
  */
 unsigned int getAdcResult() {
     return result;
 }
 
 /**
- * @brief 
- * @return 
+ * @brief Gets averaged over 2^ADC_AVERAGING_BITS times result of data
+ *  convertion.
+ * @return averaged result.
  */
 unsigned int getAdcAveraged() {
     return (unsigned int)(averaged >> ADC_AVERAGING_BITS);
@@ -45,7 +46,6 @@ unsigned int getAdcAveraged() {
 /**
  * @brief This function is ADC's interrupt request handler
  *  so keep it extremely small and fast.
- * @return 
  */
 void ADC1_EOC_handler() __interrupt(22) {
     result = ADC_DRH << 2;
