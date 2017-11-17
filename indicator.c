@@ -66,7 +66,7 @@ void refreshDisplay() {
  * @param value to be set: true - enable test mode, false - disable test mode.
  */
 void setDisplayTestMode(bool val) {
-    const unsigned char* tstMsg = "8.8.8.";
+    const unsigned char* tstMsg = "-1.2";
 
     if (!testMode && val) {
         setDisplayStr(tstMsg);
@@ -101,7 +101,18 @@ void setDisplayDot(unsigned char id, bool val) {
  */
 void setDisplayStr(const unsigned char* val){
     unsigned char i, d;
-    for (i = 0, d = 3; *val+i != '\0' && d != 0; i++, d--) {
+    
+    // get number of display digit(s) required to show given string.
+    for (i = 0, d = 0; *(val+i) != 0; i++, d++) {
+        if (*(val+i) == '.' && i > 0 && *(val+i-1) != '.') d--;
+    }
+    // at this point d = required digits
+    // but SSD have 3 digits only. So rest is doesn't matters.
+    if (d > 3) d = 3;
+    // disable the digit if it is not needed.
+    for (i = 3-d; i > 0; i--) setDigit(3-i, ' ', false);
+    // set values for digits.
+    for (i = 0; d != 0 && *val+i != 0; i++, d--) {
         if (*(val+i+1) == '.') {
             setDigit(d-1, *(val+i), true);
             i++;

@@ -21,7 +21,7 @@ void gpioInit(void) {
  */
 int main() {
     const unsigned char* errMsg = "ERR";
-    unsigned char paramMsg[] = {' ','P','0',0};
+    unsigned char paramMsg[] = {'P','0',0};
     unsigned char param = 0;
     int d;
 
@@ -44,7 +44,7 @@ int main() {
             setDisplayUInt(getParamById(EEPROM_PARAM_THRESHOLD));
             setDisplayOff((bool)(getUptime() & 0x40));
         } else if (getMenuDisplay() == MENU_SELECT_PARAM) {
-            paramMsg[2] = '0' + getParamId();
+            paramMsg[1] = '0' + getParamId();
             setDisplayStr((unsigned char*)&paramMsg);
             setDisplayOff(false);
         } else if (getMenuDisplay() == MENU_CHANGE_PARAM) {
