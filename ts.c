@@ -5,14 +5,7 @@
  * @brief TODO: move this functionality into appropriate place.
  */
 void gpioInit(void) {
-    // Configure system clock
-//    CLK_DIVR = 0x00;    // Set the frequency to 16 MHz
-//    CLK_PCKENR1 = 0xFF; // Enable peripherals
 
-    // Configure pins
-    // relay PA.3
-    PA_DDR = 0x0E;
-    PA_CR1 = 0x0E;
     return;
 }
 
@@ -25,23 +18,23 @@ int main() {
     unsigned char param = 0;
     int d;
 
-    gpioInit();
+    initMenu();
     initParamsEEPROM();
     initIndicator();
     initTimer();
     initButtons();
     initADC();
+    initRelay();
 
     INTERRUPT_ENABLE
     // Loop
     do {
-//        RELAY_PORT ^= RELAY_BIT; //toggle LED
         if (getUptimeSeconds() > 0) setDisplayTestMode(false);
         if (getMenuDisplay() == MENU_ROOT) {
-            setDisplayUInt(getAdcAveraged());
+            setDisplayUInt(getAdcAveraged() >> 4); // todo: see issue #1 and #2
             setDisplayOff(false);
         } else if (getMenuDisplay() == MENU_SET_THRESHOLD) {
-            setDisplayUInt(getParamById(EEPROM_PARAM_THRESHOLD));
+            setDisplayUInt(getParamById(PARAM_THRESHOLD));
             setDisplayOff((bool)(getUptime() & 0x40));
         } else if (getMenuDisplay() == MENU_SELECT_PARAM) {
             paramMsg[1] = '0' + getParamId();
