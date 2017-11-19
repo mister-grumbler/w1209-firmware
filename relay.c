@@ -33,29 +33,28 @@ void setRelay(bool on) {
  */
 void refreshRelay() {
     if (mode) { // Relay mode is enabled
-        if ((getAdcAveraged() >> 4) < (getParamById(PARAM_THRESHOLD)
+        if (getTemperature() < (getParamById(PARAM_THRESHOLD)
             - (getParamById(PARAM_RELAY_HYSTERESIS) >> 3))) {
-                
             timer++;
             if ((getParamById(PARAM_RELAY_DELAY) << RELAY_TIMER_MULTIPLIER) < timer) {
                 mode = false;
-                setRelay(!getParamById(PARAM_RELAY_MODE));
-            } else {
                 setRelay(getParamById(PARAM_RELAY_MODE));
+            } else {
+                setRelay(!getParamById(PARAM_RELAY_MODE));
             }
         } else {
             timer = 0;
-            setRelay(getParamById(PARAM_RELAY_MODE));
+            setRelay(!getParamById(PARAM_RELAY_MODE));
         }
     } else { // Relay mode is disabled
-        if ((getAdcAveraged() >> 4) > (getParamById(PARAM_THRESHOLD)
+        if (getTemperature() > (getParamById(PARAM_THRESHOLD)
             + (getParamById(PARAM_RELAY_HYSTERESIS) >> 3))) {
             timer++;
             if ((getParamById(PARAM_RELAY_DELAY) << RELAY_TIMER_MULTIPLIER) < timer) {
                 mode = true;
-                setRelay(getParamById(PARAM_RELAY_MODE));
-            } else {
                 setRelay(!getParamById(PARAM_RELAY_MODE));
+            } else {
+                setRelay(getParamById(PARAM_RELAY_MODE));
             }
         } else {
             timer = 0;
