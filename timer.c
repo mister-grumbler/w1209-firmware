@@ -15,6 +15,9 @@ static unsigned long uptime;
  * @brief Initialize timer's configuration registers
  */
 void initTimer() {
+    // Configure system clock
+//    CLK_DIVR = 0x00;    // Set the frequency to 16 MHz
+//    CLK_PCKENR1 = 0xFF; // Enable peripherals
     TIM4_PSCR = 0x06;
     TIM4_IER = 0x01;    // Enable interrupt on update event
     TIM4_CR1 = 0x05;    // Enable timer
@@ -72,7 +75,7 @@ unsigned char getUptimeDays() {
 
 /**
  * @brief This function is timer's interrupt request handler
- * so keep it extremely small and fast.
+ * so keep it small and fast as much as possible.
  */
 void TIM4_UPD_handler() __interrupt(23) {
     TIM4_SR &= ~TIM_SR1_UIF; // Reset flag
@@ -92,7 +95,9 @@ void TIM4_UPD_handler() __interrupt(23) {
         uptime &= ~0xFFFFFF;
         uptime += (unsigned long)1 << 24;
     }
+    // Try not to call all refresh functions at once.
     refreshDisplay();
     if (((unsigned char)uptime & 0x07) == 1) refreshMenu();
     if (((unsigned char)uptime & 0x3F) == 2) startADC();
+    if (((unsigned char)uptime & 0x3F) == 3) refreshRelay();
 }
