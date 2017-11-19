@@ -53,7 +53,7 @@
 
 #define RELAY_PORT              PA_ODR
 #define RELAY_BIT               0x08
-#define RELAY_TIMER_MULTIPLIER  6
+#define RELAY_TIMER_MULTIPLIER  7
 
 /* Definition for timer 4 (indicator refresh) */
 // control register 1
@@ -176,6 +176,7 @@ void initADC();
 void startADC();
 unsigned int getAdcResult();
 unsigned int getAdcAveraged();
+int getTemperature();
 void ADC1_EOC_handler() __interrupt(22);
 
 void initParamsEEPROM();

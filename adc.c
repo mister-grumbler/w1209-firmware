@@ -44,6 +44,16 @@ unsigned int getAdcAveraged() {
 }
 
 /**
+ * @brief Calculation of real temperature using averaged result of
+ *  A-D conversion.
+ * @return temperature in tenth of degrees of Celsius.
+ */
+int getTemperature() {
+    return (averaged >> ADC_AVERAGING_BITS)
+        + getParamById(PARAM_TEMPERATURE_CORRECTION) - 163; // for tests only. fix it!
+}
+
+/**
  * @brief This function is ADC's interrupt request handler
  *  so keep it extremely small and fast.
  */
@@ -51,6 +61,7 @@ void ADC1_EOC_handler() __interrupt(22) {
     result = ADC_DRH << 2;
     result |= ADC_DRL;
     ADC_CSR &= ~0x80;   // reset EOC
+    result = 512 - result;   // for tests only. remove it!
     // Averaging result
     if(averaged == 0) {
         averaged = result << ADC_AVERAGING_BITS;
