@@ -172,13 +172,13 @@ void feedMenu(unsigned char event) {
                 timer = 0;
                 break;
             case MENU_EVENT_PUSH_BUTTON2:
-                setParamId(EEPROM_PARAM_THRESHOLD);
+                setParamId(PARAM_THRESHOLD);
                 incParam();
             case MENU_EVENT_RELEASE_BUTTON2:
                 timer = 0;
                 break;
             case MENU_EVENT_PUSH_BUTTON3:
-                setParamId(EEPROM_PARAM_THRESHOLD);
+                setParamId(PARAM_THRESHOLD);
                 decParam();
             case MENU_EVENT_RELEASE_BUTTON3:
                 timer = 0;

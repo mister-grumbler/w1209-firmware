@@ -51,8 +51,9 @@
 // PD.4
 #define SSD_DIGIT_3_BIT     0x10
 
-#define RELAY_PORT          PA_ODR
-#define RELAY_BIT           0x08
+#define RELAY_PORT              PA_ODR
+#define RELAY_BIT               0x08
+#define RELAY_TIMER_MULTIPLIER  6
 
 /* Definition for timer 4 (indicator refresh) */
 // control register 1
@@ -109,11 +110,20 @@
 #define ADC_AVERAGING_BITS  6
 
 /* Definitions for EEPROM */
-#define FLASH_DUKR              *(unsigned char*)0x5064
-#define FLASH_IAPSR             *(unsigned char*)0x505F
-#define EEPROM_BASE_ADDR        0x4000
-#define EEPROM_PARAMS_OFFSET    100
-#define EEPROM_PARAM_THRESHOLD  9
+#define FLASH_DUKR                      *(unsigned char*)0x5064
+#define FLASH_IAPSR                     *(unsigned char*)0x505F
+#define EEPROM_BASE_ADDR                0x4000
+#define EEPROM_PARAMS_OFFSET            100
+
+/* Definition for parameters */
+#define PARAM_RELAY_MODE                0
+#define PARAM_RELAY_HYSTERESIS          1
+#define PARAM_MAX_TEMPERATURE           2
+#define PARAM_MIN_TEMPERATURE           3
+#define PARAM_TEMPERATURE_CORRECTION    4
+#define PARAM_RELAY_DELAY               5
+#define PARAM_OVERHEAT_INDICATION       6
+#define PARAM_THRESHOLD                 9
 
 /* Definitions for menu */
 #define MENU_ROOT          0
@@ -180,6 +190,11 @@ void setParamId(unsigned char);
 void incParamId();
 void decParamId();
 
+void initMenu();
 void feedMenu(unsigned char event);
 void refreshMenu();
 unsigned char getMenuDisplay();
+
+void initRelay();
+void setRelay(bool on);
+void refreshRelay();
