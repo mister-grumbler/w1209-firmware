@@ -6,9 +6,10 @@
 
 const unsigned char Hex2CharMap[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
-unsigned char activeDigitId;
-unsigned char displayAC[3];
-unsigned char displayD[3];
+static unsigned char activeDigitId;
+static unsigned char displayAC[3];
+static unsigned char displayD[3];
+static unsigned char stringBuffer[20];
 
 static void enableDigit(unsigned char);
 static void setDigit(unsigned char, unsigned char, bool);
@@ -66,7 +67,7 @@ void refreshDisplay() {
  * @param value to be set: true - enable test mode, false - disable test mode.
  */
 void setDisplayTestMode(bool val) {
-    const unsigned char* tstMsg = "-1.2";
+    const unsigned char* tstMsg = "8.8.8.";
 
     if (!testMode && val) {
         setDisplayStr(tstMsg);
