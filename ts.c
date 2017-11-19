@@ -31,7 +31,7 @@ int main() {
     do {
         if (getUptimeSeconds() > 0) setDisplayTestMode(false);
         if (getMenuDisplay() == MENU_ROOT) {
-            setDisplayUInt(getAdcAveraged() >> 4); // todo: see issue #1 and #2
+            setDisplayUInt(getTemperature()); // todo: see issue #1 and #2
             setDisplayOff(false);
         } else if (getMenuDisplay() == MENU_SET_THRESHOLD) {
             setDisplayUInt(getParamById(PARAM_THRESHOLD));
