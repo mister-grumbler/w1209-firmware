@@ -113,7 +113,7 @@ void setDisplayDot(unsigned char id, bool val) {
  * @param pointPosition
  *  put the decimal point in front of specified digit.
  */
-static void itofpa(int val, unsigned char* str[], unsigned char pointPosition)
+void itofpa(int val, unsigned char* str, unsigned char pointPosition)
 {
     unsigned char i, l, buffer[] = {0,0,0,0,0,0};
     bool minus = false;
@@ -157,7 +157,7 @@ static void itofpa(int val, unsigned char* str[], unsigned char pointPosition)
 }
 
 void setDisplayInt(int val) {
-    itofpa(val, stringBuffer, 0);
+    itofpa(val, (unsigned char *)stringBuffer, 0);
     setDisplayStr((unsigned char*)stringBuffer);
 }
 

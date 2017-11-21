@@ -152,6 +152,7 @@ void setDisplayUChar(unsigned char);
 void setDisplayUCharHex(unsigned char);
 void setDisplayUCharBCD(unsigned char);
 void setDisplayUIntBCD(unsigned int);
+void itofpa(int, unsigned char*, unsigned char);
 
 void initTimer();
 void resetUptime();
@@ -181,16 +182,17 @@ int getTemperature();
 void ADC1_EOC_handler() __interrupt(22);
 
 void initParamsEEPROM();
-signed char getParamById(unsigned char);
-void setParamById(unsigned char, signed char);
-signed char getParam();
-void setParam(signed char);
+int getParamById(unsigned char);
+void setParamById(unsigned char, int);
+int getParam();
+void setParam(int);
 void incParam();
 void decParam();
 unsigned char getParamId();
 void setParamId(unsigned char);
 void incParamId();
 void decParamId();
+void paramToString(unsigned char, unsigned char*);
 
 void initMenu();
 void feedMenu(unsigned char event);

@@ -18,10 +18,10 @@
 #include "ts.h"
 
 static unsigned char paramId;
-static signed char paramCache[10];
-const signed char paramMin[] = {0,1,-45,-50,-70,0,0,0,0,-50};
-const signed char paramMax[] = {1,126,110,105,70,10,1,0,0,110};
-const signed char paramDefault[] = {0,20,110,-50,0,0,0,0,00,20};
+static int paramCache[10];
+const int paramMin[] = {0,1,-45,-50,-70,0,0,0,0,-500};
+const int paramMax[] = {1,150,110,105,70,10,1,0,0,1100};
+const int paramDefault[] = {0,20,110,-50,0,0,0,0,00,20};
 
 /**
  * @brief Check values in the EEPROM to be correct then load them into parameters' cache.
@@ -39,7 +39,7 @@ void initParamsEEPROM() {
  * @param id
  * @return 
  */
-signed char getParamById(unsigned char id) {
+int getParamById(unsigned char id) {
     if (id < 10) {
         return paramCache[id];
     }
@@ -51,7 +51,7 @@ signed char getParamById(unsigned char id) {
  * @param id
  * @param val
  */
-void setParamById(unsigned char id, signed char val) {
+void setParamById(unsigned char id, int val) {
     if (id < 10) {
         paramCache[id] = val;
     }
@@ -61,7 +61,7 @@ void setParamById(unsigned char id, signed char val) {
  * @brief 
  * @return 
  */
-signed char getParam() {
+int getParam() {
     return paramCache[paramId];
 }
 
@@ -69,7 +69,7 @@ signed char getParam() {
  * @brief 
  * @param val
  */
-void setParam(signed char val) {
+void setParam(int val) {
     paramCache[paramId] = val;
 }
 
@@ -124,10 +124,60 @@ void decParamId() {
 }
 
 /**
+ * @brief Converts the current value of the selected parameter to a string.
+ * @param id
+ *  The identifier of the parameter to be processed.
+ * @param strBuff
+ *  A pointer to a string buffer where the result should be placed.
+ */
+void paramToString(unsigned char id, unsigned char* strBuff) {
+    switch(id) {
+        case PARAM_RELAY_MODE:
+            if (paramCache[id]) {
+                ((unsigned char*) strBuff)[0] = 'H';
+            } else {
+                ((unsigned char*) strBuff)[0] = 'C';
+            }
+            ((unsigned char*) strBuff)[1] = 0;
+            break;
+        case PARAM_RELAY_HYSTERESIS:
+            itofpa(paramCache[id], strBuff, 0);
+            break;
+        case PARAM_MAX_TEMPERATURE:
+            itofpa(paramCache[id], strBuff, 6);
+            break;
+        case PARAM_MIN_TEMPERATURE:
+            itofpa(paramCache[id], strBuff, 6);
+            break;
+        case PARAM_TEMPERATURE_CORRECTION:
+            itofpa(paramCache[id], strBuff, 0);
+            break;
+        case PARAM_RELAY_DELAY:
+            itofpa(paramCache[id], strBuff, 6);
+            break;
+        case PARAM_OVERHEAT_INDICATION:
+            ((unsigned char*) strBuff)[0] = 'O';
+            if (paramCache[id]) {
+                ((unsigned char*) strBuff)[1] = 'F';
+                ((unsigned char*) strBuff)[2] = 'F';
+                ((unsigned char*) strBuff)[3] = 0;
+            } else {
+                ((unsigned char*) strBuff)[1] = 'N';
+                ((unsigned char*) strBuff)[2] = 0;
+            }
+            break;
+        case PARAM_THRESHOLD:
+            itofpa(paramCache[id], strBuff, 0);
+            break;
+        default:
+    }
+}
+
+/**
  * @brief 
  */
 void storeParams() {
-    char i;
+    unsigned char i;
 
     //  Check if the EEPROM is write-protected.  If it is then unlock the EEPROM.
     if ((FLASH_IAPSR & 0x08) == 0) {
@@ -137,8 +187,8 @@ void storeParams() {
 
     //  Write to the EEPROM parameters which value is changed.
     for (i = 0; i < 10; i++) {
-        if ((unsigned char) paramCache[i] != (*(unsigned char*) (EEPROM_BASE_ADDR + i))) {
-            *(unsigned char*) (EEPROM_BASE_ADDR + EEPROM_PARAMS_OFFSET + i) = (unsigned char)paramCache[i];
+        if ((char) paramCache[i] != (*(char*) (EEPROM_BASE_ADDR + i))) {
+            *(char*) (EEPROM_BASE_ADDR + EEPROM_PARAMS_OFFSET + i) = (char)paramCache[i];
         }
     }
 

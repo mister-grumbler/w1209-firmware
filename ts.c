@@ -13,6 +13,7 @@ void gpioInit(void) {
  * @brief 
  */
 int main() {
+    static unsigned char* stringBuffer[7];
     const unsigned char* errMsg = "ERR";
     unsigned char paramMsg[] = {'P','0',0};
     unsigned char param = 0;
@@ -40,7 +41,9 @@ int main() {
             setDisplayStr((unsigned char*)&paramMsg);
             setDisplayOff(false);
         } else if (getMenuDisplay() == MENU_CHANGE_PARAM) {
-            setDisplayInt(getParam());
+            paramToString(getParamId(), (char*)stringBuffer);
+            setDisplayStr((char *)stringBuffer);
+//            setDisplayInt(getParam());
             setDisplayOff(false);
         } else {
             setDisplayStr(errMsg);
