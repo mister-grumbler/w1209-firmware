@@ -4,12 +4,14 @@
 
 #include "ts.h"
 
+#define SSD_BUFFER_SIZE 6
+
 const unsigned char Hex2CharMap[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
 static unsigned char activeDigitId;
 static unsigned char displayAC[3];
 static unsigned char displayD[3];
-static unsigned char stringBuffer[20];
+static unsigned char* stringBuffer[SSD_BUFFER_SIZE];
 
 static void enableDigit(unsigned char);
 static void setDigit(unsigned char, unsigned char, bool);
@@ -22,6 +24,8 @@ static bool testMode;
  *  variables and set test mode for display.
  */
 void initIndicator() {
+    unsigned char i;
+
     PA_DDR |= SSD_SEG_B_BIT | SSD_SEG_F_BIT;
     PA_CR1 |= SSD_SEG_B_BIT | SSD_SEG_F_BIT;
     PB_DDR |= SSD_DIGIT_1_BIT | SSD_DIGIT_2_BIT;
@@ -33,6 +37,7 @@ void initIndicator() {
     displayOff= false;
     activeDigitId = 0;
     setDisplayTestMode(true);
+    for (i = 0; i > SSD_BUFFER_SIZE; i++) stringBuffer[i] = 0;
 }
 
 /**
@@ -42,8 +47,8 @@ void initIndicator() {
  *  GPIO pins of microcontroller.
  */
 void refreshDisplay() {
+    enableDigit(3);
     if (displayOff) {
-        enableDigit(3);
         return;
     }
     SSD_SEG_BF_PORT &= ~SSD_BF_PORT_MASK;
@@ -94,6 +99,66 @@ void setDisplayDot(unsigned char id, bool val) {
     } else {
         displayD[id] &= ~SSD_SEG_P_BIT;
     }
+}
+
+/**
+ * @brief Construction of a string representation of the given value.
+ *  To emulate a floating-point value, a decimal point can be inserted
+ *  before a certain digit.
+ *  When the decimal point is not needed, set pointPosition to 6 or more.
+ * @param val
+ *  the value to be processed.
+ * @param str
+ *  pointer to buffer for constructed string.
+ * @param pointPosition
+ *  put the decimal point in front of specified digit.
+ */
+static void itofpa(int val, unsigned char* str[], unsigned char pointPosition)
+{
+    unsigned char i, l, buffer[] = {0,0,0,0,0,0};
+    bool minus = false;
+
+    // No calculation is required for zero value
+    if (val == 0) {
+        ((unsigned char*) str)[0] = '0';
+        ((unsigned char*) str)[1] = 0;
+        return;
+    }
+    // Correction for processing of negative value
+    if (val < 0) {
+        minus = true;
+        val = -val;
+    }
+    // Forming the reverse string
+    for (i = 0; val != 0; i++) {
+        buffer[i] = '0' + (val % 10);
+        if (i == pointPosition) {
+            i++;
+            buffer[i] = '.';
+        }
+        val /= 10;
+    }
+    // Add leading '0' in case of ".x" result
+    if (i == 2) {
+        buffer[i] = '0';
+        i++;
+    }
+    // Add '-' sign for negative values
+    if (minus) {
+        buffer[i] = '-';
+        i++;
+    }
+    // Reversing to get the result string
+    for (l = i; i > 0; i--) {
+        ((unsigned char*) str)[l-i] = buffer[i-1];
+    }
+    // Put null at the end of string
+    ((unsigned char*) str)[l] = 0;
+}
+
+void setDisplayInt(int val) {
+    itofpa(val, stringBuffer, 0);
+    setDisplayStr((unsigned char*)stringBuffer);
 }
 
 /**

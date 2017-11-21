@@ -145,6 +145,7 @@ void setDisplayOff(bool val);
 void setDisplayTestMode(bool);
 void setDisplayDot(unsigned char id, bool val);
 void setDisplayStr(const unsigned char*);
+void setDisplayInt(int);
 void setDisplayUInt(unsigned int);
 void setDisplayUIntHex(unsigned int);
 void setDisplayUChar(unsigned char);

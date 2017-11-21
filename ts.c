@@ -21,27 +21,27 @@ int main() {
     initMenu();
     initParamsEEPROM();
     initIndicator();
-    initTimer();
     initButtons();
     initADC();
     initRelay();
+    initTimer();
 
     INTERRUPT_ENABLE
     // Loop
     do {
         if (getUptimeSeconds() > 0) setDisplayTestMode(false);
         if (getMenuDisplay() == MENU_ROOT) {
-            setDisplayUInt(getTemperature()); // todo: see issue #1 and #2
+            setDisplayInt(getTemperature()); // todo: see issue #1 and #2
             setDisplayOff(false);
         } else if (getMenuDisplay() == MENU_SET_THRESHOLD) {
-            setDisplayUInt(getParamById(PARAM_THRESHOLD));
+            setDisplayInt(getParamById(PARAM_THRESHOLD));
             setDisplayOff((bool)(getUptime() & 0x40));
         } else if (getMenuDisplay() == MENU_SELECT_PARAM) {
             paramMsg[1] = '0' + getParamId();
             setDisplayStr((unsigned char*)&paramMsg);
             setDisplayOff(false);
         } else if (getMenuDisplay() == MENU_CHANGE_PARAM) {
-            setDisplayUInt(getParam());
+            setDisplayInt(getParam());
             setDisplayOff(false);
         } else {
             setDisplayStr(errMsg);
