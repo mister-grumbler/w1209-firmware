@@ -35,7 +35,6 @@ int main() {
             setDisplayOff(false);
         } else if (getMenuDisplay() == MENU_SET_THRESHOLD) {
             setDisplayInt(getParamById(PARAM_THRESHOLD));
-            setDisplayOff((bool)(getUptime() & 0x40));
         } else if (getMenuDisplay() == MENU_SELECT_PARAM) {
             paramMsg[1] = '0' + getParamId();
             setDisplayStr((unsigned char*)&paramMsg);

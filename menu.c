@@ -49,6 +49,8 @@ unsigned char getMenuDisplay() {
  *  MENU_EVENT_CHECK_TIMER
  */
 void feedMenu(unsigned char event) {
+    bool blink;
+
     if (menuState == MENU_ROOT) {
         switch(event) {
             case MENU_EVENT_PUSH_BUTTON1:
@@ -184,6 +186,21 @@ void feedMenu(unsigned char event) {
                 timer = 0;
                 break;
             case MENU_EVENT_CHECK_TIMER:
+                blink = (bool)(getUptime() & 0x40);
+                if (getButton() & (BUTTON2_BIT | BUTTON3_BIT)) {
+                    blink = false;
+                }
+                if (timer > MENU_1_SEC_PASSED + MENU_AUTOINC_DELAY) {
+                    setParamId(PARAM_THRESHOLD);
+                    if (getButton2()) {
+                        incParam();
+                        timer = MENU_1_SEC_PASSED;
+                    } else if (getButton3()) {
+                        decParam();
+                        timer = MENU_1_SEC_PASSED;
+                    }
+                }
+                setDisplayOff(blink);
                 if (timer > MENU_5_SEC_PASSED) {
                     timer = 0;
                     if (getButton1()) {
