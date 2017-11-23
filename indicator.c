@@ -139,7 +139,7 @@ void itofpa(int val, unsigned char* str, unsigned char pointPosition)
         val /= 10;
     }
     // Add leading '0' in case of ".x" result
-    if (i == 2) {
+    if (buffer[i-1] == '.') {
         buffer[i] = '0';
         i++;
     }
