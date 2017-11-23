@@ -72,7 +72,7 @@ void refreshDisplay() {
  * @param value to be set: true - enable test mode, false - disable test mode.
  */
 void setDisplayTestMode(bool val) {
-    const unsigned char* tstMsg = "8.8.8.";
+    const unsigned char* tstMsg = "888";
 
     if (!testMode && val) {
         setDisplayStr(tstMsg);
@@ -412,85 +412,29 @@ static void setDigit(unsigned char id, unsigned char val, bool dot) {
             displayAC[id] = SSD_SEG_F_BIT | SSD_SEG_G_BIT;
             displayD[id] = SSD_SEG_A_BIT | SSD_SEG_E_BIT;
             break;
-        case 'G':
-            displayAC[id] = SSD_SEG_C_BIT | SSD_SEG_F_BIT;
-            displayD[id] = SSD_SEG_A_BIT | SSD_SEG_D_BIT | SSD_SEG_E_BIT;
-            break;
         case 'H':
-            displayAC[id] = SSD_SEG_C_BIT | SSD_SEG_F_BIT | SSD_SEG_G_BIT;
+            displayAC[id] = SSD_SEG_B_BIT | SSD_SEG_C_BIT | SSD_SEG_F_BIT | SSD_SEG_G_BIT;
             displayD[id] = SSD_SEG_E_BIT;
-            break;
-        case 'I':
-            displayAC[id] = SSD_SEG_F_BIT;
-            displayD[id] = SSD_SEG_E_BIT;
-            break;
-        case 'J':
-            displayAC[id] = SSD_SEG_B_BIT | SSD_SEG_C_BIT;
-            displayD[id] = SSD_SEG_D_BIT;
-            break;
-        case 'K':
-            displayAC[id] = SSD_SEG_C_BIT | SSD_SEG_F_BIT | SSD_SEG_G_BIT;
-            displayD[id] = SSD_SEG_A_BIT | SSD_SEG_E_BIT;
             break;
         case 'L':
             displayAC[id] = SSD_SEG_F_BIT;
             displayD[id] = SSD_SEG_D_BIT | SSD_SEG_E_BIT;
             break;
-        case 'M':
-            displayAC[id] = SSD_SEG_C_BIT | SSD_SEG_G_BIT;
+        case 'N':
+            displayAC[id] = SSD_SEG_B_BIT | SSD_SEG_F_BIT | SSD_SEG_C_BIT;
             displayD[id] = SSD_SEG_A_BIT | SSD_SEG_E_BIT;
             break;
-        case 'N':
-            displayAC[id] = SSD_SEG_C_BIT | SSD_SEG_G_BIT;
-            displayD[id] = SSD_SEG_E_BIT;
-            break;
         case 'O':
-            displayAC[id] = SSD_SEG_C_BIT | SSD_SEG_G_BIT;
-            displayD[id] = SSD_SEG_D_BIT | SSD_SEG_E_BIT;
+            displayAC[id] = SSD_SEG_B_BIT | SSD_SEG_F_BIT | SSD_SEG_C_BIT;
+            displayD[id] = SSD_SEG_A_BIT | SSD_SEG_D_BIT | SSD_SEG_E_BIT;
             break;
         case 'P':
             displayAC[id] = SSD_SEG_B_BIT | SSD_SEG_F_BIT | SSD_SEG_G_BIT;
             displayD[id] = SSD_SEG_A_BIT | SSD_SEG_E_BIT;
             break;
-        case 'Q':
-            displayAC[id] = SSD_SEG_B_BIT | SSD_SEG_C_BIT | SSD_SEG_F_BIT | SSD_SEG_G_BIT;
-            displayD[id] = SSD_SEG_A_BIT;
-            break;
         case 'R':
             displayAC[id] = SSD_SEG_F_BIT;
             displayD[id] = SSD_SEG_A_BIT | SSD_SEG_E_BIT;
-            break;
-        case 'S':
-            displayAC[id] = SSD_SEG_C_BIT | SSD_SEG_F_BIT | SSD_SEG_G_BIT;
-            displayD[id] = SSD_SEG_D_BIT;
-            break;
-        case 'T':
-            displayAC[id] = SSD_SEG_F_BIT | SSD_SEG_G_BIT;
-            displayD[id] = SSD_SEG_D_BIT | SSD_SEG_E_BIT;
-            break;
-        case 'U':
-            displayAC[id] = SSD_SEG_C_BIT;
-            displayD[id] = SSD_SEG_D_BIT | SSD_SEG_E_BIT;
-            break;
-        case 'V':
-            displayAC[id] = SSD_SEG_B_BIT | SSD_SEG_C_BIT | SSD_SEG_F_BIT;
-            displayD[id] = SSD_SEG_D_BIT | SSD_SEG_E_BIT;
-            break;
-        case 'W':
-            displayAC[id] = SSD_SEG_B_BIT | SSD_SEG_F_BIT | SSD_SEG_G_BIT;
-            displayD[id] = SSD_SEG_D_BIT;
-            break;
-        case 'X':
-            displayAC[id] = SSD_SEG_B_BIT | SSD_SEG_C_BIT | SSD_SEG_F_BIT | SSD_SEG_G_BIT;
-            displayD[id] = SSD_SEG_E_BIT;
-            break;
-        case 'Y':
-            displayAC[id] = SSD_SEG_B_BIT | SSD_SEG_C_BIT | SSD_SEG_F_BIT | SSD_SEG_G_BIT;
-            displayD[id] = SSD_SEG_D_BIT;
-            break;
-        case 'Z':
-            displayAC[id] = SSD_SEG_B_BIT | SSD_SEG_G_BIT;
-            displayD[id] = SSD_SEG_D_BIT | SSD_SEG_E_BIT;
             break;
         default:
             displayAC[id] = 0;
