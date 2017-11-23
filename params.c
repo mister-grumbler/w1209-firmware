@@ -74,19 +74,23 @@ void setParam(int val) {
 }
 
 /**
- * @brief 
+ * @brief Incrementing the value of the currently selected parameter.
  */
 void incParam() {
-    if (paramCache[paramId] < paramMax[paramId]) {
+    if (paramId == PARAM_RELAY_MODE || paramId == PARAM_OVERHEAT_INDICATION) {
+        paramCache[paramId] = ~paramCache[paramId] & 0x0001;
+    } else if (paramCache[paramId] < paramMax[paramId]) {
         paramCache[paramId]++;
     }
 }
 
 /**
- * @brief 
+ * @brief Decrementing the value of the currently selected parameter.
  */
 void decParam() {
-    if (paramCache[paramId] > paramMin[paramId]) {
+    if (paramId == PARAM_RELAY_MODE || paramId == PARAM_OVERHEAT_INDICATION) {
+        paramCache[paramId] = ~paramCache[paramId] & 0x0001;
+    } else if (paramCache[paramId] > paramMin[paramId]) {
         paramCache[paramId]--;
     }
 }
@@ -158,13 +162,13 @@ void paramToString(unsigned char id, unsigned char* strBuff) {
         case PARAM_OVERHEAT_INDICATION:
             ((unsigned char*) strBuff)[0] = 'O';
             if (paramCache[id]) {
+                ((unsigned char*) strBuff)[1] = 'N';
+                ((unsigned char*) strBuff)[2] = ' ';
+            } else {
                 ((unsigned char*) strBuff)[1] = 'F';
                 ((unsigned char*) strBuff)[2] = 'F';
-                ((unsigned char*) strBuff)[3] = 0;
-            } else {
-                ((unsigned char*) strBuff)[1] = 'N';
-                ((unsigned char*) strBuff)[2] = 0;
             }
+            ((unsigned char*) strBuff)[3] = 0;
             break;
         case PARAM_THRESHOLD:
             itofpa(paramCache[id], strBuff, 0);
