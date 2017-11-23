@@ -6,7 +6,7 @@
 
 // TODO: these values should be corrected afterwards
 // to correspond more precise to given time intervals.
-#define MENU_AUTOINC_DELAY  3
+#define MENU_AUTOINC_DELAY  1
 #define MENU_1_SEC_PASSED   15
 #define MENU_3_SEC_PASSED   45
 #define MENU_5_SEC_PASSED   90
@@ -80,8 +80,7 @@ void feedMenu(unsigned char event) {
                 break;
         }
     } else if(menuState == MENU_SELECT_PARAM) {
-        // TODO: select param +/-, go to MENU_CHANGE_PARAM,
-        // store on timeout and return to MENU_ROOT
+        // TODO: store into EEPROM on timeout and return to MENU_ROOT
         switch(event) {
             case MENU_EVENT_PUSH_BUTTON1:
                 menuState = menuDisplay = MENU_CHANGE_PARAM;
@@ -118,8 +117,7 @@ void feedMenu(unsigned char event) {
                 break;
         }
     } else if(menuState == MENU_CHANGE_PARAM) {
-        // TODO: value +/-, return to MENU_SELECT_PARAM,
-        // store on timeout and return to MENU_ROOT
+        // TODO: store into EEPROM on timeout and return to MENU_ROOT
         switch(event) {
             case MENU_EVENT_PUSH_BUTTON1:
                 menuState = menuDisplay = MENU_SELECT_PARAM;
@@ -160,16 +158,17 @@ void feedMenu(unsigned char event) {
                 break;
         }
     } else if(menuState == MENU_SET_THRESHOLD) {
-        // TODO: threshold +/-, on button1 store and return to MENU_ROOT,
-        // on timeout store and return to MENU_ROOT
+        // TODO: on timeout store into EEPROM and return to MENU_ROOT
         switch(event) {
             case MENU_EVENT_PUSH_BUTTON1:
                 timer = 0;
                 menuDisplay = MENU_ROOT;
+                setDisplayOff(false);
                 break;
             case MENU_EVENT_RELEASE_BUTTON1:
                 if (timer < MENU_5_SEC_PASSED) {
                     menuState = MENU_ROOT;
+                    setDisplayOff(false);
                 }
                 timer = 0;
                 break;
@@ -205,9 +204,11 @@ void feedMenu(unsigned char event) {
                     timer = 0;
                     if (getButton1()) {
                         menuState = menuDisplay = MENU_SELECT_PARAM;
+                        setDisplayOff(false);
                         break;
                     }
                     menuState = menuDisplay = MENU_ROOT;
+                    setDisplayOff(false);
                 }
                 break;
             default:
