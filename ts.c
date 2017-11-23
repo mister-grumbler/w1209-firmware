@@ -14,10 +14,8 @@ void gpioInit(void) {
  */
 int main() {
     static unsigned char* stringBuffer[7];
-    const unsigned char* errMsg = "ERR";
     unsigned char paramMsg[] = {'P','0',0};
     unsigned char param = 0;
-    int d;
 
     initMenu();
     initParamsEEPROM();
@@ -32,25 +30,28 @@ int main() {
     do {
         if (getUptimeSeconds() > 0) setDisplayTestMode(false);
         if (getMenuDisplay() == MENU_ROOT) {
-            setDisplayInt(getTemperature()); // todo: see issue #1 and #2
-            setDisplayOff(false);
+            int temp = getTemperature();
+            setDisplayInt(temp); // todo: see issue #1 and #2
+            if (getParamById(PARAM_OVERHEAT_INDICATION)) {
+                if (temp < getParamById(PARAM_MIN_TEMPERATURE)) {
+                    setDisplayStr("LLL");
+                } else if (temp > getParamById(PARAM_MAX_TEMPERATURE)) {
+                    setDisplayStr("HHH");
+                }
+            }
         } else if (getMenuDisplay() == MENU_SET_THRESHOLD) {
             setDisplayInt(getParamById(PARAM_THRESHOLD));
         } else if (getMenuDisplay() == MENU_SELECT_PARAM) {
             paramMsg[1] = '0' + getParamId();
             setDisplayStr((unsigned char*)&paramMsg);
-            setDisplayOff(false);
         } else if (getMenuDisplay() == MENU_CHANGE_PARAM) {
             paramToString(getParamId(), (char*)stringBuffer);
             setDisplayStr((char *)stringBuffer);
-//            setDisplayInt(getParam());
-            setDisplayOff(false);
         } else {
-            setDisplayStr(errMsg);
+            setDisplayStr("ERR");
             setDisplayOff((bool)(getUptime() & 0x40));
         }
-        for(d = 0; d<9900; d++);
+
         WAIT_FOR_INTERRUPT
     } while(true);
-
 }
