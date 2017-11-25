@@ -1,17 +1,17 @@
 #include "ts.h"
 
 static unsigned int timer;
-static bool mode;
+static bool state;
 
 /**
  * @brief Configure appropriate bits for GPIO port A, reset local timer
- *  and reset mode.
+ *  and reset state.
  */
 void initRelay() {
     PA_DDR |= RELAY_BIT;
     PA_CR1 |= RELAY_BIT;
     timer = 0;
-    mode = false;
+    state = false;
 }
 
 /**
@@ -32,12 +32,12 @@ void setRelay(bool on) {
  *  request so keep it extremely small and fast.
  */
 void refreshRelay() {
-    if (mode) { // Relay mode is enabled
+    if (state) { // Relay state is enabled
         if (getTemperature() < (getParamById(PARAM_THRESHOLD)
             - (getParamById(PARAM_RELAY_HYSTERESIS) >> 3))) {
             timer++;
             if ((getParamById(PARAM_RELAY_DELAY) << RELAY_TIMER_MULTIPLIER) < timer) {
-                mode = false;
+                state = false;
                 setRelay(getParamById(PARAM_RELAY_MODE));
             } else {
                 setRelay(!getParamById(PARAM_RELAY_MODE));
@@ -46,12 +46,12 @@ void refreshRelay() {
             timer = 0;
             setRelay(!getParamById(PARAM_RELAY_MODE));
         }
-    } else { // Relay mode is disabled
+    } else { // Relay state is disabled
         if (getTemperature() > (getParamById(PARAM_THRESHOLD)
             + (getParamById(PARAM_RELAY_HYSTERESIS) >> 3))) {
             timer++;
             if ((getParamById(PARAM_RELAY_DELAY) << RELAY_TIMER_MULTIPLIER) < timer) {
-                mode = true;
+                state = true;
                 setRelay(!getParamById(PARAM_RELAY_MODE));
             } else {
                 setRelay(getParamById(PARAM_RELAY_MODE));

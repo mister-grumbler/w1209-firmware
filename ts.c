@@ -1,21 +1,11 @@
 #include "ts.h"
 
-
-/**
- * @brief TODO: move this functionality into appropriate place.
- */
-void gpioInit(void) {
-
-    return;
-}
-
 /**
  * @brief 
  */
 int main() {
     static unsigned char* stringBuffer[7];
     unsigned char paramMsg[] = {'P','0',0};
-    unsigned char param = 0;
 
     initMenu();
     initParamsEEPROM();
