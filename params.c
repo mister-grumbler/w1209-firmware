@@ -173,7 +173,11 @@ void paramToString(unsigned char id, unsigned char* strBuff) {
         case PARAM_THRESHOLD:
             itofpa(paramCache[id], strBuff, 0);
             break;
-        default:
+        default: // Display "OFF" to all unknown ID
+            ((unsigned char*) strBuff)[0] = 'O';
+            ((unsigned char*) strBuff)[1] = 'F';
+            ((unsigned char*) strBuff)[2] = 'F';
+            ((unsigned char*) strBuff)[3] = 0;
     }
 }
 
