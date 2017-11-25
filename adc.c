@@ -33,7 +33,9 @@ const unsigned int rawAdc[] = {
     49, 48, 47, 47, 46
 };
 
-#define ADC_RAW_TO_TEMPERATURE_SIZE sizeof rawAdc / 2
+#define ADC_RAW_TABLE_SIZE          sizeof rawAdc / sizeof rawAdc[0]
+// Base temperature in tenth of degrees of Celsius.
+#define ADC_RAW_TABLE_BASE_TEMP     -520
 
 /**
  * @brief Initialize ADC's configuration registers.
@@ -78,19 +80,27 @@ unsigned int getAdcAveraged() {
  */
 int getTemperature() {
     unsigned int val = averaged >> ADC_AVERAGING_BITS;
-    unsigned char r = ADC_RAW_TO_TEMPERATURE_SIZE, l = 0;
+    unsigned char rightBound = ADC_RAW_TABLE_SIZE;
+    unsigned char leftBound = 0;
 
-    while ((r - l) > 1) {
-        unsigned int m = (l + r) >> 1;
-        unsigned int mid = rawAdc[m];
-        if (val > mid) {
-            r = m;
+    // search
+    while ((rightBound - leftBound) > 1) {
+        unsigned char midId = (leftBound + rightBound) >> 1;
+        if (val > rawAdc[midId]) {
+            rightBound = midId;
         } else {
-            l = m;
+            leftBound = midId;
         }
     }
-
-    return -520 + (r * 10) + getParamById(PARAM_TEMPERATURE_CORRECTION);
+    // reusing the "val" for storing an intermediate result
+    if (val >= rawAdc[leftBound]) {
+        val = leftBound * 10;
+    } else {
+        val = (rightBound * 10) - ((val - rawAdc[rightBound]) * 10)
+                / (rawAdc[leftBound] - rawAdc[rightBound]);
+    }
+    // Final calculation and correction
+    return ADC_RAW_TABLE_BASE_TEMP + val + getParamById(PARAM_TEMPERATURE_CORRECTION);
 }
 
 /**
