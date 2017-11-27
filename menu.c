@@ -185,9 +185,10 @@ void feedMenu(unsigned char event) {
                 timer = 0;
                 break;
             case MENU_EVENT_CHECK_TIMER:
-                blink = (bool)(getUptime() & 0x40);
-                if (getButton() & (BUTTON2_BIT | BUTTON3_BIT)) {
+                if (getButton2() || getButton3()) {
                     blink = false;
+                } else {
+                    blink = (bool)(getUptime() & 0x40);
                 }
                 if (timer > MENU_1_SEC_PASSED + MENU_AUTOINC_DELAY) {
                     setParamId(PARAM_THRESHOLD);
