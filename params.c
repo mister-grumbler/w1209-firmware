@@ -17,19 +17,33 @@
 
 #include "ts.h"
 
+/* Definitions for EEPROM */
+#define FLASH_DUKR                      *(unsigned char*)0x5064
+#define FLASH_IAPSR                     *(unsigned char*)0x505F
+#define EEPROM_BASE_ADDR                0x4000
+#define EEPROM_PARAMS_OFFSET            100
+
 static unsigned char paramId;
 static int paramCache[10];
 const int paramMin[] = {0,1,-45,-50,-70,0,0,0,0,-500};
 const int paramMax[] = {1,150,110,105,70,10,1,0,0,1100};
-const int paramDefault[] = {0,20,110,-50,0,0,0,0,00,20};
+const int paramDefault[] = {0,20,110,-50,0,0,0,0,0,20};
 
 /**
  * @brief Check values in the EEPROM to be correct then load them into parameters' cache.
  */
 void initParamsEEPROM() {
-    for (paramId = 0; paramId < 10; paramId++) {
-        // TODO: implement check values
-        paramCache[paramId] = paramDefault[paramId];
+    if (getButton2() && getButton3()) {
+        // Restore parameters to default values
+        for (paramId = 0; paramId < 10; paramId++) {
+            paramCache[paramId] = paramDefault[paramId];
+        }
+        storeParams();
+    } else {
+        // Load parameters from EEPROM
+        for (paramId = 0; paramId < 10; paramId++) {
+            paramCache[paramId] = *(int*)(EEPROM_BASE_ADDR + EEPROM_PARAMS_OFFSET + (paramId * sizeof paramCache[0]));
+        }
     }
     paramId = 0;
 }
@@ -115,7 +129,7 @@ void setParamId(unsigned char val) {
  * @brief 
  */
 void incParamId() {
-    if (paramId < 9) paramId++;
+    if (paramId < 6) paramId++;
     else paramId = 0;
 }
 
@@ -124,7 +138,7 @@ void incParamId() {
  */
 void decParamId() {
     if (paramId > 0) paramId--;
-    else paramId = 9;
+    else paramId = 6;
 }
 
 /**
@@ -182,7 +196,7 @@ void paramToString(unsigned char id, unsigned char* strBuff) {
 }
 
 /**
- * @brief 
+ * @brief Stores updated parameters from paramCache into EEPROM.
  */
 void storeParams() {
     unsigned char i;
@@ -195,8 +209,8 @@ void storeParams() {
 
     //  Write to the EEPROM parameters which value is changed.
     for (i = 0; i < 10; i++) {
-        if ((char) paramCache[i] != (*(char*) (EEPROM_BASE_ADDR + i))) {
-            *(char*) (EEPROM_BASE_ADDR + EEPROM_PARAMS_OFFSET + i) = (char)paramCache[i];
+        if (paramCache[i] != (*(int*)(EEPROM_BASE_ADDR + EEPROM_PARAMS_OFFSET + (i * sizeof paramCache[0])))) {
+            *(int*) (EEPROM_BASE_ADDR + EEPROM_PARAMS_OFFSET + (i * sizeof paramCache[0])) = paramCache[i];
         }
     }
 
