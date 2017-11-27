@@ -1,5 +1,9 @@
 #include "ts.h"
 
+#define RELAY_PORT              PA_ODR
+#define RELAY_BIT               0x08
+#define RELAY_TIMER_MULTIPLIER  7
+
 static unsigned int timer;
 static bool state;
 

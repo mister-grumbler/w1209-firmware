@@ -4,6 +4,28 @@
 
 #include "ts.h"
 
+/* Definitions for ADC */
+// 22 - ADC1 interrupt
+// Port D.6 (pin 3) is used as analog input (AIN6)
+#define ADC_CSR     *(unsigned char*)0x5400
+#define ADC_CR1     *(unsigned char*)0x5401
+#define ADC_CR2     *(unsigned char*)0x5402
+#define ADC_CR3     *(unsigned char*)0x5403
+#define ADC_DRH     *(unsigned char*)0x5404
+#define ADC_DRL     *(unsigned char*)0x5405
+#define ADC_TDRH    *(unsigned char*)0x5406
+#define ADC_TDRL    *(unsigned char*)0x5407
+#define ADC_HTRH    *(unsigned char*)0x5408
+#define ADC_HTRL    *(unsigned char*)0x5409
+#define ADC_LTRH    *(unsigned char*)0x540A
+#define ADC_LTRL    *(unsigned char*)0x540B
+#define ADC_AWSRH   *(unsigned char*)0x540C
+#define ADC_AWSRL   *(unsigned char*)0x540D
+#define ADC_AWCRH   *(unsigned char*)0x540E
+#define ADC_AWCRL   *(unsigned char*)0x540F
+// Averaging bits
+#define ADC_AVERAGING_BITS  5
+
 static unsigned int result;
 static unsigned long averaged;
 

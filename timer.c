@@ -4,6 +4,22 @@
 
 #include "ts.h"
 
+/* Definition for timer 4 (indicator refresh) */
+// control register 1
+#define TIM4_CR1    *(unsigned char*)0x5340
+// interrupt enable register
+#define TIM4_IER    *(unsigned char*)0x5343
+// status register
+#define TIM4_SR     *(unsigned char*)0x5344
+// event generation register
+#define TIM4_EGR    *(unsigned char*)0x5345
+// counter register
+#define TIM4_CNTR   *(unsigned char*)0x5346
+// prescaler register
+#define TIM4_PSCR   *(unsigned char*)0x5347
+// auto-reload register
+#define TIM4_ARR    *(unsigned char*)0x5348
+
 /**
  * Uptime counter
  * |--Day--|--Hour--|--Minute--|--Second--|--Ticks--|

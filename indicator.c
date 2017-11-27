@@ -4,6 +4,49 @@
 
 #include "ts.h"
 
+/* Definitions for indicator */
+// Port A controls segments: B, F
+// 0000 0110
+#define SSD_SEG_BF_PORT     PA_ODR
+#define SSD_BF_PORT_MASK    0b00000110
+// Port C controls segments: C, G
+// 1100 0000
+#define SSD_SEG_CG_PORT     PC_ODR
+#define SSD_CG_PORT_MASK    0b11000000
+// Port D controls segments: A, E, D, P
+// 0010 1110
+#define SSD_SEG_AEDP_PORT   PD_ODR
+#define SSD_AEDP_PORT_MASK  0b00101110
+
+// PD.5
+#define SSD_SEG_A_BIT       0x20
+// PA.2
+#define SSD_SEG_B_BIT       0x04
+// PC.7
+#define SSD_SEG_C_BIT       0x80
+// PD.3
+#define SSD_SEG_D_BIT       0x08
+// PD.1
+#define SSD_SEG_E_BIT       0x02
+// PA.1
+#define SSD_SEG_F_BIT       0x02
+// PC.6
+#define SSD_SEG_G_BIT       0x40
+// PD.2
+#define SSD_SEG_P_BIT       0x04
+
+// Port B controls digits: 1, 2
+#define SSD_DIGIT_12_PORT   PB_ODR
+// Port D controls digit: 3
+#define SSD_DIGIT_3_PORT    PD_ODR
+
+// PB.4
+#define SSD_DIGIT_1_BIT     0x10
+// PB.5
+#define SSD_DIGIT_2_BIT     0x20
+// PD.4
+#define SSD_DIGIT_3_BIT     0x10
+
 #define SSD_BUFFER_SIZE 6
 
 const unsigned char Hex2CharMap[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
