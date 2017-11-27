@@ -8,9 +8,9 @@ int main() {
     unsigned char paramMsg[] = {'P','0',0};
 
     initMenu();
+    initButtons();
     initParamsEEPROM();
     initIndicator();
-    initButtons();
     initADC();
     initRelay();
     initTimer();
