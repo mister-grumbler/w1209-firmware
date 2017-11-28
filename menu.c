@@ -126,6 +126,7 @@ void feedMenu (unsigned char event)
             if (timer > MENU_5_SEC_PASSED) {
                 timer = 0;
                 setParamId (0);
+                storeParams();
                 menuState = menuDisplay = MENU_ROOT;
             }
 
@@ -177,6 +178,7 @@ void feedMenu (unsigned char event)
 
             if (timer > MENU_5_SEC_PASSED) {
                 timer = 0;
+                storeParams();
                 menuState = menuDisplay = MENU_ROOT;
             }
 
@@ -196,6 +198,7 @@ void feedMenu (unsigned char event)
 
         case MENU_EVENT_RELEASE_BUTTON1:
             if (timer < MENU_5_SEC_PASSED) {
+                storeParams();
                 menuState = MENU_ROOT;
                 setDisplayOff (false);
             }
@@ -249,6 +252,7 @@ void feedMenu (unsigned char event)
                     break;
                 }
 
+                storeParams();
                 menuState = menuDisplay = MENU_ROOT;
                 setDisplayOff (false);
             }
