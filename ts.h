@@ -34,18 +34,18 @@
 
 void initIndicator();
 void refreshDisplay();
-void setDisplayOff(bool val);
-void setDisplayTestMode(bool);
-void setDisplayDot(unsigned char id, bool val);
-void setDisplayStr(const unsigned char*);
-void setDisplayInt(int);
-void setDisplayUInt(unsigned int);
-void setDisplayUIntHex(unsigned int);
-void setDisplayUChar(unsigned char);
-void setDisplayUCharHex(unsigned char);
-void setDisplayUCharBCD(unsigned char);
-void setDisplayUIntBCD(unsigned int);
-void itofpa(int, unsigned char*, unsigned char);
+void setDisplayOff (bool val);
+void setDisplayTestMode (bool);
+void setDisplayDot (unsigned char id, bool val);
+void setDisplayStr (const unsigned char*);
+void setDisplayInt (int);
+void setDisplayUInt (unsigned int);
+void setDisplayUIntHex (unsigned int);
+void setDisplayUChar (unsigned char);
+void setDisplayUCharHex (unsigned char);
+void setDisplayUCharBCD (unsigned char);
+void setDisplayUIntBCD (unsigned int);
+void itofpa (int, unsigned char*, unsigned char);
 
 void initTimer();
 void resetUptime();
@@ -54,7 +54,7 @@ unsigned char getUptimeSeconds();
 unsigned char getUptimeMinutes();
 unsigned char getUptimeHours();
 unsigned char getUptimeDays();
-void TIM4_UPD_handler() __interrupt(23);
+void TIM4_UPD_handler() __interrupt (23);
 
 void initButtons();
 unsigned char getButton();
@@ -65,34 +65,34 @@ bool getButton3();
 bool isButton1();
 bool isButton2();
 bool isButton3();
-void EXTI2_handler() __interrupt(5);
+void EXTI2_handler() __interrupt (5);
 
 void initADC();
 void startADC();
 unsigned int getAdcResult();
 unsigned int getAdcAveraged();
 int getTemperature();
-void ADC1_EOC_handler() __interrupt(22);
+void ADC1_EOC_handler() __interrupt (22);
 
 void initParamsEEPROM();
-int getParamById(unsigned char);
-void setParamById(unsigned char, int);
+int getParamById (unsigned char);
+void setParamById (unsigned char, int);
 int getParam();
-void setParam(int);
+void setParam (int);
 void incParam();
 void decParam();
 unsigned char getParamId();
-void setParamId(unsigned char);
+void setParamId (unsigned char);
 void incParamId();
 void decParamId();
-void paramToString(unsigned char, unsigned char*);
+void paramToString (unsigned char, unsigned char*);
 void storeParams();
 
 void initMenu();
-void feedMenu(unsigned char event);
+void feedMenu (unsigned char event);
 void refreshMenu();
 unsigned char getMenuDisplay();
 
 void initRelay();
-void setRelay(bool on);
+void setRelay (bool on);
 void refreshRelay();

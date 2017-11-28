@@ -1,6 +1,6 @@
 /**
  * Control functions for EEPROM storage of persistent application parameters.
- * 
+ *
  * The list of aplication parameters with default values:
  * Name |Def| Description
  * -----+---+---------------------------------------------
@@ -12,85 +12,96 @@
  * P4 - | 0 | 7.0 ... -7.0 Correction of temperature value
  * P5 - | 0 | 0 ... 10 Relay switching delay in minutes
  * P6 - |Off| On/Off Indication of overheating
- * TH - | 20| Threshold value
+ * TH - | 28| Threshold value
  */
 
 #include "ts.h"
 
 /* Definitions for EEPROM */
-#define FLASH_DUKR                      *(unsigned char*)0x5064
-#define FLASH_IAPSR                     *(unsigned char*)0x505F
-#define EEPROM_BASE_ADDR                0x4000
-#define EEPROM_PARAMS_OFFSET            100
+#define FLASH_DUKR              *(unsigned char*)0x5064
+#define FLASH_IAPSR             *(unsigned char*)0x505F
+#define EEPROM_BASE_ADDR        0x4000
+#define EEPROM_PARAMS_OFFSET    100
 
 static unsigned char paramId;
 static int paramCache[10];
-const int paramMin[] = {0,1,-45,-50,-70,0,0,0,0,-500};
-const int paramMax[] = {1,150,110,105,70,10,1,0,0,1100};
-const int paramDefault[] = {0,20,110,-50,0,0,0,0,0,20};
+const int paramMin[] = {0, 1, -45, -50, -70, 0, 0, 0, 0, -500};
+const int paramMax[] = {1, 150, 110, 105, 70, 10, 1, 0, 0, 1100};
+const int paramDefault[] = {0, 20, 110, -50, 0, 0, 0, 0, 0, 280};
 
 /**
- * @brief Check values in the EEPROM to be correct then load them into parameters' cache.
+ * @brief Check values in the EEPROM to be correct then load them into
+ * parameters' cache.
  */
-void initParamsEEPROM() {
-    if (getButton2() && getButton3()) {
+void initParamsEEPROM()
+{
+    if (getButton2() && getButton3() ) {
         // Restore parameters to default values
         for (paramId = 0; paramId < 10; paramId++) {
             paramCache[paramId] = paramDefault[paramId];
         }
+
         storeParams();
     } else {
         // Load parameters from EEPROM
         for (paramId = 0; paramId < 10; paramId++) {
-            paramCache[paramId] = *(int*)(EEPROM_BASE_ADDR + EEPROM_PARAMS_OFFSET + (paramId * sizeof paramCache[0]));
+            paramCache[paramId] = * (int*) (EEPROM_BASE_ADDR + EEPROM_PARAMS_OFFSET
+                                            + (paramId * sizeof paramCache[0]) );
         }
     }
+
     paramId = 0;
 }
 
 /**
- * @brief 
+ * @brief
  * @param id
- * @return 
+ * @return
  */
-int getParamById(unsigned char id) {
+int getParamById (unsigned char id)
+{
     if (id < 10) {
         return paramCache[id];
     }
+
     return -1;
 }
 
 /**
- * @brief 
+ * @brief
  * @param id
  * @param val
  */
-void setParamById(unsigned char id, int val) {
+void setParamById (unsigned char id, int val)
+{
     if (id < 10) {
         paramCache[id] = val;
     }
 }
 
 /**
- * @brief 
- * @return 
+ * @brief
+ * @return
  */
-int getParam() {
+int getParam()
+{
     return paramCache[paramId];
 }
 
 /**
- * @brief 
+ * @brief
  * @param val
  */
-void setParam(int val) {
+void setParam (int val)
+{
     paramCache[paramId] = val;
 }
 
 /**
  * @brief Incrementing the value of the currently selected parameter.
  */
-void incParam() {
+void incParam()
+{
     if (paramId == PARAM_RELAY_MODE || paramId == PARAM_OVERHEAT_INDICATION) {
         paramCache[paramId] = ~paramCache[paramId] & 0x0001;
     } else if (paramCache[paramId] < paramMax[paramId]) {
@@ -101,7 +112,8 @@ void incParam() {
 /**
  * @brief Decrementing the value of the currently selected parameter.
  */
-void decParam() {
+void decParam()
+{
     if (paramId == PARAM_RELAY_MODE || paramId == PARAM_OVERHEAT_INDICATION) {
         paramCache[paramId] = ~paramCache[paramId] & 0x0001;
     } else if (paramCache[paramId] > paramMin[paramId]) {
@@ -110,35 +122,47 @@ void decParam() {
 }
 
 /**
- * @brief 
- * @return 
+ * @brief
+ * @return
  */
-unsigned char getParamId() {
+unsigned char getParamId()
+{
     return paramId;
 }
 
 /**
- * @brief 
+ * @brief
  * @param val
  */
-void setParamId(unsigned char val) {
-    if (val < 10) paramId = val;
+void setParamId (unsigned char val)
+{
+    if (val < 10) {
+        paramId = val;
+    }
 }
 
 /**
- * @brief 
+ * @brief
  */
-void incParamId() {
-    if (paramId < 6) paramId++;
-    else paramId = 0;
+void incParamId()
+{
+    if (paramId < 6) {
+        paramId++;
+    } else {
+        paramId = 0;
+    }
 }
 
 /**
- * @brief 
+ * @brief
  */
-void decParamId() {
-    if (paramId > 0) paramId--;
-    else paramId = 6;
+void decParamId()
+{
+    if (paramId > 0) {
+        paramId--;
+    } else {
+        paramId = 6;
+    }
 }
 
 /**
@@ -148,90 +172,105 @@ void decParamId() {
  * @param strBuff
  *  A pointer to a string buffer where the result should be placed.
  */
-void paramToString(unsigned char id, unsigned char* strBuff) {
-    switch(id) {
-        case PARAM_RELAY_MODE:
-            if (paramCache[id]) {
-                ((unsigned char*) strBuff)[0] = 'H';
-            } else {
-                ((unsigned char*) strBuff)[0] = 'C';
-            }
-            ((unsigned char*) strBuff)[1] = 0;
-            break;
-        case PARAM_RELAY_HYSTERESIS:
-            itofpa(paramCache[id], strBuff, 0);
-            break;
-        case PARAM_MAX_TEMPERATURE:
-            itofpa(paramCache[id], strBuff, 6);
-            break;
-        case PARAM_MIN_TEMPERATURE:
-            itofpa(paramCache[id], strBuff, 6);
-            break;
-        case PARAM_TEMPERATURE_CORRECTION:
-            itofpa(paramCache[id], strBuff, 0);
-            break;
-        case PARAM_RELAY_DELAY:
-            itofpa(paramCache[id], strBuff, 6);
-            break;
-        case PARAM_OVERHEAT_INDICATION:
-            ((unsigned char*) strBuff)[0] = 'O';
-            if (paramCache[id]) {
-                ((unsigned char*) strBuff)[1] = 'N';
-                ((unsigned char*) strBuff)[2] = ' ';
-            } else {
-                ((unsigned char*) strBuff)[1] = 'F';
-                ((unsigned char*) strBuff)[2] = 'F';
-            }
-            ((unsigned char*) strBuff)[3] = 0;
-            break;
-        case PARAM_THRESHOLD:
-            itofpa(paramCache[id], strBuff, 0);
-            break;
-        default: // Display "OFF" to all unknown ID
-            ((unsigned char*) strBuff)[0] = 'O';
-            ((unsigned char*) strBuff)[1] = 'F';
-            ((unsigned char*) strBuff)[2] = 'F';
-            ((unsigned char*) strBuff)[3] = 0;
+void paramToString (unsigned char id, unsigned char* strBuff)
+{
+    switch (id) {
+    case PARAM_RELAY_MODE:
+        if (paramCache[id]) {
+            ( (unsigned char*) strBuff) [0] = 'H';
+        } else {
+            ( (unsigned char*) strBuff) [0] = 'C';
+        }
+
+        ( (unsigned char*) strBuff) [1] = 0;
+        break;
+
+    case PARAM_RELAY_HYSTERESIS:
+        itofpa (paramCache[id], strBuff, 0);
+        break;
+
+    case PARAM_MAX_TEMPERATURE:
+        itofpa (paramCache[id], strBuff, 6);
+        break;
+
+    case PARAM_MIN_TEMPERATURE:
+        itofpa (paramCache[id], strBuff, 6);
+        break;
+
+    case PARAM_TEMPERATURE_CORRECTION:
+        itofpa (paramCache[id], strBuff, 0);
+        break;
+
+    case PARAM_RELAY_DELAY:
+        itofpa (paramCache[id], strBuff, 6);
+        break;
+
+    case PARAM_OVERHEAT_INDICATION:
+        ( (unsigned char*) strBuff) [0] = 'O';
+
+        if (paramCache[id]) {
+            ( (unsigned char*) strBuff) [1] = 'N';
+            ( (unsigned char*) strBuff) [2] = ' ';
+        } else {
+            ( (unsigned char*) strBuff) [1] = 'F';
+            ( (unsigned char*) strBuff) [2] = 'F';
+        }
+
+        ( (unsigned char*) strBuff) [3] = 0;
+        break;
+
+    case PARAM_THRESHOLD:
+        itofpa (paramCache[id], strBuff, 0);
+        break;
+
+    default: // Display "OFF" to all unknown ID
+        ( (unsigned char*) strBuff) [0] = 'O';
+        ( (unsigned char*) strBuff) [1] = 'F';
+        ( (unsigned char*) strBuff) [2] = 'F';
+        ( (unsigned char*) strBuff) [3] = 0;
     }
 }
 
 /**
  * @brief Stores updated parameters from paramCache into EEPROM.
  */
-void storeParams() {
+void storeParams()
+{
     unsigned char i;
 
     //  Check if the EEPROM is write-protected.  If it is then unlock the EEPROM.
-    if ((FLASH_IAPSR & 0x08) == 0) {
+    if ( (FLASH_IAPSR & 0x08) == 0) {
         FLASH_DUKR = 0xAE;
         FLASH_DUKR = 0x56;
     }
 
     //  Write to the EEPROM parameters which value is changed.
     for (i = 0; i < 10; i++) {
-        if (paramCache[i] != (*(int*)(EEPROM_BASE_ADDR + EEPROM_PARAMS_OFFSET + (i * sizeof paramCache[0])))) {
-            *(int*) (EEPROM_BASE_ADDR + EEPROM_PARAMS_OFFSET + (i * sizeof paramCache[0])) = paramCache[i];
+        if (paramCache[i] != (* (int*) (EEPROM_BASE_ADDR + EEPROM_PARAMS_OFFSET
+                                        + (i * sizeof paramCache[0]) ) ) ) {
+            * (int*) (EEPROM_BASE_ADDR + EEPROM_PARAMS_OFFSET
+                      + (i * sizeof paramCache[0]) ) = paramCache[i];
         }
     }
 
     //  Now write protect the EEPROM.
     FLASH_IAPSR &= ~0x08;
 }
-
 /**
- * @brief 
+ * @brief
  * @param val
  * @param offset
  */
-static void writeEEPROM(unsigned char val, unsigned char offset) {
+static void writeEEPROM (unsigned char val, unsigned char offset)
+{
     //  Check if the EEPROM is write-protected.  If it is then unlock the EEPROM.
-    if ((FLASH_IAPSR & 0x08) == 0) {
+    if ( (FLASH_IAPSR & 0x08) == 0) {
         FLASH_DUKR = 0xAE;
         FLASH_DUKR = 0x56;
     }
 
     //  Write the data to the EEPROM.
-    (*(unsigned char*) (EEPROM_BASE_ADDR + offset)) = val;
+    (* (unsigned char*) (EEPROM_BASE_ADDR + offset) ) = val;
 
     //  Now write protect the EEPROM.
     FLASH_IAPSR &= ~0x08;
