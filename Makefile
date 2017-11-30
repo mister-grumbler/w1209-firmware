@@ -16,7 +16,7 @@ LinkOptions            := --out-fmt-ihx -mstm8
 OutputFile             :=$(BuildDirectory)/$(ProjectName).ihx
 ObjectSwitch           :=-o 
 MakeDirCommand         :=mkdir -p
-IncludePath            := $(IncludeSwitch). 
+IncludePath            := $(IncludeSwitch). $(IncludeSwitch)./include 
 
 ##
 ## Common variables
