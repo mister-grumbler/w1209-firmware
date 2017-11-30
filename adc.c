@@ -4,7 +4,8 @@
  * The port D6 (pin 3) is used as analog input (AIN6).
  */
 
-#include "ts.h"
+#include "adc.h"
+#include "params.h"
 
 /* Definitions for ADC configuration and control registers */
 #define ADC_CSR     *(unsigned char*)0x5400

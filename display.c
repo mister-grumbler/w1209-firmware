@@ -2,7 +2,8 @@
  * Control functions for the seven-segment display (SSD).
  */
 
-#include "ts.h"
+#include "stm8l.h"
+#include "display.h"
 
 /* Definitions for display */
 // Port A controls segments: B, F

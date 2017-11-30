@@ -15,7 +15,9 @@
  * TH - | 28| Threshold value
  */
 
-#include "ts.h"
+#include "params.h"
+#include "buttons.h"
+#include "display.h"
 
 /* Definitions for EEPROM */
 #define FLASH_DUKR              *(unsigned char*)0x5064

@@ -2,7 +2,11 @@
  * Implementation of application menu.
  */
 
-#include "ts.h"
+#include "menu.h"
+#include "buttons.h"
+#include "display.h"
+#include "params.h"
+#include "timer.h"
 
 // TODO: these values should be corrected afterwards
 // to correspond more precise to given time intervals.

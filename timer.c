@@ -3,7 +3,12 @@
  * The TIM4 interrupt (23) is used to get signal on update event.
  */
 
-#include "ts.h"
+#include "stm8l.h"
+#include "timer.h"
+#include "adc.h"
+#include "display.h"
+#include "menu.h"
+#include "relay.h"
 
 /* Definition for timer 4 */
 // control register 1

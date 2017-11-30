@@ -1,4 +1,11 @@
-#include "ts.h"
+/**
+ * Control functions for relay.
+ */
+
+#include "stm8l.h"
+#include "relay.h"
+#include "adc.h"
+#include "params.h"
 
 #define RELAY_PORT              PA_ODR
 #define RELAY_BIT               0x08

@@ -1,4 +1,12 @@
 #include "ts.h"
+#include "stm8l.h"
+#include "adc.h"
+#include "buttons.h"
+#include "display.h"
+#include "menu.h"
+#include "params.h"
+#include "relay.h"
+#include "timer.h"
 
 /**
  * @brief
