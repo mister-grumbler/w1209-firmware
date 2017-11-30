@@ -4,7 +4,7 @@
 
 #include "ts.h"
 
-/* Definitions for indicator */
+/* Definitions for display */
 // Port A controls segments: B, F
 // 0000 0110
 #define SSD_SEG_BF_PORT     PA_ODR
@@ -68,7 +68,7 @@ static bool testMode;
  * @brief Configure appropriate bits for GPIO ports, initialize static
  *  variables and set test mode for display.
  */
-void initIndicator()
+void initDisplay()
 {
     unsigned char i;
 
@@ -264,113 +264,6 @@ void setDisplayStr (const unsigned char* val)
 
 /**
  * @brief
- * @param val
- */
-void setDisplayUCharHex (unsigned char val)
-{
-    setDigit (0, Hex2CharMap[val & 0x0F], false);
-    setDigit (1, Hex2CharMap[ (val & 0xF0) >> 4], false);
-}
-
-/**
- * @brief
- * @param val
- */
-void setDisplayUIntHex (unsigned int val)
-{
-    setDigit (0, Hex2CharMap[val & 0x000F], false);
-    setDigit (1, Hex2CharMap[ (val & 0x00F0) >> 4], false);
-    setDigit (2, Hex2CharMap[ (val & 0x0F00) >> 8], false);
-}
-
-/**
- * @brief
- * @param val
- */
-void setDisplayUInt (unsigned int val)
-{
-    unsigned int output = 0;
-    signed char a;
-
-    for (a = 13; a >= 0; a--) {
-        if ( (output & 0xF) >= 5) {
-            output += 3;
-        }
-
-        if ( ( (output & 0xF0) >> 4) >= 5) {
-            output += (3 << 4);
-        }
-
-        if ( ( (output & 0xF00) >> 8) >= 5) {
-            output += (3 << 8);
-        }
-
-        output = (output << 1) | ( (val >> a) & 1);
-    }
-
-    setDisplayUIntBCD (output);
-}
-
-/**
- * @brief
- * @param val
- */
-void setDisplayUChar (unsigned char val)
-{
-    unsigned char tmp;
-
-    if (val >= 100) {
-        tmp = val / 100;
-
-        if (tmp > 0) {
-            setDigit (2, Hex2CharMap[tmp], false);
-        }
-
-        val = val - (tmp * 100);
-    } else {
-        setDigit (2, Hex2CharMap[0], false);
-    }
-
-    if (val >= 10) {
-        tmp = val / 10;
-
-        if (tmp > 0) {
-            setDigit (1, Hex2CharMap[tmp], false);
-        }
-
-        val = val - (tmp * 10);
-    } else {
-        setDigit (1, Hex2CharMap[0], false);
-    }
-
-    setDigit (0, Hex2CharMap[val], false);
-}
-
-/**
- * @brief
- * @param val
- */
-void setDisplayUCharBCD (unsigned char val)
-{
-    setDigit (2, Hex2CharMap[0], false);
-    setDigit (1, Hex2CharMap[ (val & 0xF0) >> 4], false);
-    setDigit (0, Hex2CharMap[val & 0xF], false);
-}
-
-/**
- * @brief
- * @param val
- */
-void setDisplayUIntBCD (unsigned int val)
-{
-    setDigit (2, Hex2CharMap[ (val & 0xF00) >> 8], false);
-    setDigit (1, Hex2CharMap[ (val & 0xF0) >> 4], false);
-    setDigit (0, Hex2CharMap[val & 0xF], false);
-}
-
-
-/**
- * @brief
  * Enable the digit with given ID on SSD and rest of digits are disabled.
  *
  * @param id
@@ -406,7 +299,7 @@ static void enableDigit (unsigned char id)
 
 /**
  * @brief Sets bits within display's buffer appropriate to given value.
- *  So this symbol will be shown on indicator during refreshDisplay() call.
+ *  So this symbol will be shown on display during refreshDisplay() call.
  *  When test mode is enabled the display's buffer will not be updated.
  *
  * The list of segments as they located on display:

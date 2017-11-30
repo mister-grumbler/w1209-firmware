@@ -11,7 +11,7 @@ int main()
     initMenu();
     initButtons();
     initParamsEEPROM();
-    initIndicator();
+    initDisplay();
     initADC();
     initRelay();
     initTimer();

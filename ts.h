@@ -32,19 +32,12 @@
 #define MENU_EVENT_RELEASE_BUTTON3  5
 #define MENU_EVENT_CHECK_TIMER      6
 
-void initIndicator();
+void initDisplay();
 void refreshDisplay();
 void setDisplayOff (bool val);
 void setDisplayTestMode (bool);
-void setDisplayDot (unsigned char id, bool val);
 void setDisplayStr (const unsigned char*);
 void setDisplayInt (int);
-void setDisplayUInt (unsigned int);
-void setDisplayUIntHex (unsigned int);
-void setDisplayUChar (unsigned char);
-void setDisplayUCharHex (unsigned char);
-void setDisplayUCharBCD (unsigned char);
-void setDisplayUIntBCD (unsigned int);
 void itofpa (int, unsigned char*, unsigned char);
 
 void initTimer();

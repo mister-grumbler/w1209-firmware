@@ -5,7 +5,7 @@
 
 #include "ts.h"
 
-/* Definition for timer 4 (indicator refresh) */
+/* Definition for timer 4 */
 // control register 1
 #define TIM4_CR1    *(unsigned char*)0x5340
 // interrupt enable register
