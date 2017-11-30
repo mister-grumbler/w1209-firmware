@@ -122,7 +122,8 @@ void refreshDisplay()
  * @brief Enables/disables a test mode of SSDisplay. While in this mode
  *  the test message will be displayed and any attempts to update
  *  display's buffer will be ignored.
- * @param value to be set: true - enable test mode, false - disable test mode.
+ * @param val
+ *  value to be set: true - enable test mode, false - disable test mode.
  */
 void setDisplayTestMode (bool val)
 {
@@ -137,7 +138,8 @@ void setDisplayTestMode (bool val)
 
 /**
  * @brief Enable/disable display.
- * @param value to be set: true - display off, false - display on.
+ * @param val
+ *  value to be set: true - display off, false - display on.
  */
 void setDisplayOff (bool val)
 {
@@ -145,9 +147,12 @@ void setDisplayOff (bool val)
 }
 
 /**
- * @brief
+ * @brief Sets dot in the buffer of display at position pointed by id 
+ *  to the state defined by val.
  * @param id
+ *  identifier of digit 0..2
  * @param val
+ *  state of dot to be set: true - enable, false - disable.
  */
 void setDisplayDot (unsigned char id, bool val)
 {
@@ -221,6 +226,12 @@ void itofpa (int val, unsigned char* str, unsigned char pointPosition)
     ( (unsigned char*) str) [l] = 0;
 }
 
+/**
+ * @brief Sets representation of given integer value as decimal string 
+ *  into display's buffer.
+ * @param val
+ *  the integer value to be displayed.
+ */
 void setDisplayInt (int val)
 {
     itofpa (val, (unsigned char *) stringBuffer, 0);
@@ -230,6 +241,7 @@ void setDisplayInt (int val)
 /**
  * @brief Sets symbols of given null-terminated string into display's buffer.
  * @param val
+ *  pointer to the null-terminated string.
  */
 void setDisplayStr (const unsigned char* val)
 {
@@ -318,9 +330,8 @@ static void enableDigit (unsigned char id)
  *  Due to limited capabilities of SSD some characters are shown in a very
  *  schematic manner.
  *  Accepted values are: ANY.
- *  But at the moment actual characters are shown only for 0-9, A-Z, ' ', '-'.
- *  For the rest of values the '_' symbol is shown because no one knows which
- *  symbol would be added or removed tomorrow.
+ *  But only actual characters are defined. For the rest of values the 
+ *  '_' symbol is shown.
  * @param dot
  *  Enable dot (decimal point) for the character.
  *  Accepted values true/false.
