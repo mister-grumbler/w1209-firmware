@@ -2,8 +2,8 @@
  * Control functions for relay.
  */
 
-#include "stm8l.h"
 #include "relay.h"
+#include "stm8l.h"
 #include "adc.h"
 #include "params.h"
 

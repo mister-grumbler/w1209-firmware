@@ -3,8 +3,8 @@
  * The EXTI2 interrupt (5) is used to get signal on changing buttons state.
  */
 
-#include "stm8l.h"
 #include "buttons.h"
+#include "stm8l.h"
 #include "menu.h"
 
 /* Definition for external interrupts */
