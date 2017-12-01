@@ -1,7 +1,7 @@
 #ifndef BUTTONS_H
 #define BUTTONS_H
 
-#ifndef BOOL_TYPEDEF
+#ifndef bool
 #define bool    _Bool
 #define true    1
 #define false   0
@@ -17,4 +17,5 @@ bool isButton1();
 bool isButton2();
 bool isButton3();
 void EXTI2_handler() __interrupt (5);
+
 #endif

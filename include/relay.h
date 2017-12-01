@@ -1,7 +1,7 @@
 #ifndef RELAY_H
 #define RELAY_H
 
-#ifndef BOOL_TYPEDEF
+#ifndef bool
 #define bool    _Bool
 #define true    1
 #define false   0

@@ -1,12 +1,12 @@
 #ifndef MENU_H
 #define MENU_H
 
-/* Definitions for menu */
+/* Menu sections */
 #define MENU_ROOT          0
 #define MENU_SET_THRESHOLD 1
 #define MENU_SELECT_PARAM  2
 #define MENU_CHANGE_PARAM  3
-
+/* Menu events */
 #define MENU_EVENT_PUSH_BUTTON1     0
 #define MENU_EVENT_PUSH_BUTTON2     1
 #define MENU_EVENT_PUSH_BUTTON3     2
