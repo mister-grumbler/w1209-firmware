@@ -24,5 +24,6 @@ void incParamId();
 void decParamId();
 void paramToString (unsigned char, unsigned char*);
 void storeParams();
+void itofpa (int, unsigned char*, unsigned char);
 
 #endif

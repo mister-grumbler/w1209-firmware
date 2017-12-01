@@ -1,4 +1,3 @@
-#include "ts.h"
 #include "stm8l.h"
 #include "adc.h"
 #include "buttons.h"
@@ -7,6 +6,10 @@
 #include "params.h"
 #include "relay.h"
 #include "timer.h"
+
+#define INTERRUPT_ENABLE    __asm rim __endasm;
+#define INTERRUPT_DISABLE   __asm sim __endasm;
+#define WAIT_FOR_INTERRUPT  __asm wfi __endasm;
 
 /**
  * @brief
@@ -27,14 +30,15 @@ int main()
     INTERRUPT_ENABLE
 
     // Loop
-    do {
+    while (true) {
         if (getUptimeSeconds() > 0) {
             setDisplayTestMode (false);
         }
 
         if (getMenuDisplay() == MENU_ROOT) {
             int temp = getTemperature();
-            setDisplayInt (temp); // todo: see issue #1 and #2
+            itofpa (temp, (char*) stringBuffer, 0);
+            setDisplayStr ( (char*) stringBuffer);
 
             if (getParamById (PARAM_OVERHEAT_INDICATION) ) {
                 if (temp < getParamById (PARAM_MIN_TEMPERATURE) ) {
@@ -44,7 +48,8 @@ int main()
                 }
             }
         } else if (getMenuDisplay() == MENU_SET_THRESHOLD) {
-            setDisplayInt (getParamById (PARAM_THRESHOLD) );
+            paramToString(PARAM_THRESHOLD, (char*) stringBuffer);
+            setDisplayStr ((char*) stringBuffer);
         } else if (getMenuDisplay() == MENU_SELECT_PARAM) {
             paramMsg[1] = '0' + getParamId();
             setDisplayStr ( (unsigned char*) &paramMsg);
@@ -57,5 +62,5 @@ int main()
         }
 
         WAIT_FOR_INTERRUPT
-    } while (true);
+    };
 }

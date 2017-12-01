@@ -2,8 +2,8 @@
  * Control functions for the seven-segment display (SSD).
  */
 
-#include "stm8l.h"
 #include "display.h"
+#include "stm8l.h"
 
 /* Definitions for display */
 // Port A controls segments: B, F
@@ -48,8 +48,6 @@
 // PD.4
 #define SSD_DIGIT_3_BIT     0x10
 
-#define SSD_BUFFER_SIZE     6
-
 const unsigned char Hex2CharMap[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',
                                      'B', 'C', 'D', 'E', 'F'
                                     };
@@ -57,7 +55,6 @@ const unsigned char Hex2CharMap[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8'
 static unsigned char activeDigitId;
 static unsigned char displayAC[3];
 static unsigned char displayD[3];
-static unsigned char* stringBuffer[SSD_BUFFER_SIZE];
 
 static void enableDigit (unsigned char);
 static void setDigit (unsigned char, unsigned char, bool);
@@ -71,8 +68,6 @@ static bool testMode;
  */
 void initDisplay()
 {
-    unsigned char i;
-
     PA_DDR |= SSD_SEG_B_BIT | SSD_SEG_F_BIT;
     PA_CR1 |= SSD_SEG_B_BIT | SSD_SEG_F_BIT;
     PB_DDR |= SSD_DIGIT_1_BIT | SSD_DIGIT_2_BIT;
@@ -84,10 +79,6 @@ void initDisplay()
     displayOff = false;
     activeDigitId = 0;
     setDisplayTestMode (true);
-
-    for (i = 0; i > SSD_BUFFER_SIZE; i++) {
-        stringBuffer[i] = 0;
-    }
 }
 
 /**
@@ -162,81 +153,6 @@ void setDisplayDot (unsigned char id, bool val)
     } else {
         displayD[id] &= ~SSD_SEG_P_BIT;
     }
-}
-
-/**
- * @brief Construction of a string representation of the given value.
- *  To emulate a floating-point value, a decimal point can be inserted
- *  before a certain digit.
- *  When the decimal point is not needed, set pointPosition to 6 or more.
- * @param val
- *  the value to be processed.
- * @param str
- *  pointer to buffer for constructed string.
- * @param pointPosition
- *  put the decimal point in front of specified digit.
- */
-void itofpa (int val, unsigned char* str, unsigned char pointPosition)
-{
-    unsigned char i, l, buffer[] = {0, 0, 0, 0, 0, 0};
-    bool minus = false;
-
-    // No calculation is required for zero value
-    if (val == 0) {
-        ( (unsigned char*) str) [0] = '0';
-        ( (unsigned char*) str) [1] = 0;
-        return;
-    }
-
-    // Correction for processing of negative value
-    if (val < 0) {
-        minus = true;
-        val = -val;
-    }
-
-    // Forming the reverse string
-    for (i = 0; val != 0; i++) {
-        buffer[i] = '0' + (val % 10);
-
-        if (i == pointPosition) {
-            i++;
-            buffer[i] = '.';
-        }
-
-        val /= 10;
-    }
-
-    // Add leading '0' in case of ".x" result
-    if (buffer[i - 1] == '.') {
-        buffer[i] = '0';
-        i++;
-    }
-
-    // Add '-' sign for negative values
-    if (minus) {
-        buffer[i] = '-';
-        i++;
-    }
-
-    // Reversing to get the result string
-    for (l = i; i > 0; i--) {
-        ( (unsigned char*) str) [l - i] = buffer[i - 1];
-    }
-
-    // Put null at the end of string
-    ( (unsigned char*) str) [l] = 0;
-}
-
-/**
- * @brief Sets representation of given integer value as decimal string 
- *  into display's buffer.
- * @param val
- *  the integer value to be displayed.
- */
-void setDisplayInt (int val)
-{
-    itofpa (val, (unsigned char *) stringBuffer, 0);
-    setDisplayStr ( (unsigned char*) stringBuffer);
 }
 
 /**
