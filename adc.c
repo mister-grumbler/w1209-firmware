@@ -1,3 +1,20 @@
+/*
+ * This file is part of the W1209 firmware replacement project
+ * (https://github.com/mister-grumbler/w1209-firmware).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  * Control functions for analog-to-digital converter (ADC).
  * The ADC1 interrupt (22) is used to get signal on end of convertion event.
@@ -5,25 +22,9 @@
  */
 
 #include "adc.h"
+#include "stm8s003/adc.h"
 #include "params.h"
 
-/* Definitions for ADC configuration and control registers */
-#define ADC_CSR     *(unsigned char*)0x5400
-#define ADC_CR1     *(unsigned char*)0x5401
-#define ADC_CR2     *(unsigned char*)0x5402
-#define ADC_CR3     *(unsigned char*)0x5403
-#define ADC_DRH     *(unsigned char*)0x5404
-#define ADC_DRL     *(unsigned char*)0x5405
-#define ADC_TDRH    *(unsigned char*)0x5406
-#define ADC_TDRL    *(unsigned char*)0x5407
-#define ADC_HTRH    *(unsigned char*)0x5408
-#define ADC_HTRL    *(unsigned char*)0x5409
-#define ADC_LTRH    *(unsigned char*)0x540A
-#define ADC_LTRL    *(unsigned char*)0x540B
-#define ADC_AWSRH   *(unsigned char*)0x540C
-#define ADC_AWSRL   *(unsigned char*)0x540D
-#define ADC_AWCRH   *(unsigned char*)0x540E
-#define ADC_AWCRL   *(unsigned char*)0x540F
 // Averaging bits
 #define ADC_AVERAGING_BITS      4
 #define ADC_RAW_TABLE_SIZE      sizeof rawAdc / sizeof rawAdc[0]

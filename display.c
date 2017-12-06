@@ -1,9 +1,26 @@
+/*
+ * This file is part of the W1209 firmware replacement project
+ * (https://github.com/mister-grumbler/w1209-firmware).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  * Control functions for the seven-segment display (SSD).
  */
 
 #include "display.h"
-#include "stm8l.h"
+#include "stm8s003/gpio.h"
 
 /* Definitions for display */
 // Port A controls segments: B, F
@@ -78,7 +95,7 @@ void initDisplay()
     PD_CR1 |= SSD_SEG_A_BIT | SSD_SEG_D_BIT | SSD_SEG_E_BIT | SSD_SEG_P_BIT | SSD_DIGIT_3_BIT;
     displayOff = false;
     activeDigitId = 0;
-    setDisplayTestMode (true);
+    setDisplayTestMode (true, "");
 }
 
 /**
@@ -117,12 +134,14 @@ void refreshDisplay()
  * @param val
  *  value to be set: true - enable test mode, false - disable test mode.
  */
-void setDisplayTestMode (bool val)
+void setDisplayTestMode (bool val, char* str)
 {
-    const unsigned char* tstMsg = "888";
-
     if (!testMode && val) {
-        setDisplayStr (tstMsg);
+        if (*str == 0) {
+            setDisplayStr ("888");
+        } else {
+            setDisplayStr (str);
+        }
     }
 
     testMode = val;
@@ -139,7 +158,7 @@ void setDisplayOff (bool val)
 }
 
 /**
- * @brief Sets dot in the buffer of display at position pointed by id 
+ * @brief Sets dot in the buffer of display at position pointed by id
  *  to the state defined by val.
  * @param id
  *  identifier of digit 0..2
@@ -247,7 +266,7 @@ static void enableDigit (unsigned char id)
  *  Due to limited capabilities of SSD some characters are shown in a very
  *  schematic manner.
  *  Accepted values are: ANY.
- *  But only actual characters are defined. For the rest of values the 
+ *  But only actual characters are defined. For the rest of values the
  *  '_' symbol is shown.
  * @param dot
  *  Enable dot (decimal point) for the character.

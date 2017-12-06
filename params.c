@@ -1,3 +1,20 @@
+/*
+ * This file is part of the W1209 firmware replacement project
+ * (https://github.com/mister-grumbler/w1209-firmware).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  * Control functions for EEPROM storage of persistent application parameters.
  *
@@ -16,11 +33,10 @@
  */
 
 #include "params.h"
+#include "stm8s003/prom.h"
 #include "buttons.h"
 
 /* Definitions for EEPROM */
-#define FLASH_DUKR              *(unsigned char*)0x5064
-#define FLASH_IAPSR             *(unsigned char*)0x505F
 #define EEPROM_BASE_ADDR        0x4000
 #define EEPROM_PARAMS_OFFSET    100
 

@@ -1,17 +1,28 @@
+/*
+ * This file is part of the W1209 firmware replacement project
+ * (https://github.com/mister-grumbler/w1209-firmware).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  * Control functions for buttons.
  * The EXTI2 interrupt (5) is used to get signal on changing buttons state.
  */
 
 #include "buttons.h"
-#include "stm8l.h"
+#include "stm8s003/gpio.h"
 #include "menu.h"
-
-/* Definition for external interrupts */
-// control register 1
-#define EXTI_CR1    *(unsigned char*)0x50A0
-// control register 2
-#define EXTI_CR2    *(unsigned char*)0x50A1
 
 /* Definition for buttons */
 // Port C control input from buttons.

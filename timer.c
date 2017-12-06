@@ -1,30 +1,34 @@
+/*
+ * This file is part of the W1209 firmware replacement project
+ * (https://github.com/mister-grumbler/w1209-firmware).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  * Control functions for timer.
  * The TIM4 interrupt (23) is used to get signal on update event.
  */
 
 #include "timer.h"
-#include "stm8l.h"
+#include "stm8s003/clock.h"
+#include "stm8s003/timer.h"
 #include "adc.h"
 #include "display.h"
 #include "menu.h"
 #include "relay.h"
 
-/* Definition for timer 4 */
-// control register 1
-#define TIM4_CR1    *(unsigned char*)0x5340
-// interrupt enable register
-#define TIM4_IER    *(unsigned char*)0x5343
-// status register
-#define TIM4_SR     *(unsigned char*)0x5344
-// event generation register
-#define TIM4_EGR    *(unsigned char*)0x5345
-// counter register
-#define TIM4_CNTR   *(unsigned char*)0x5346
-// prescaler register
-#define TIM4_PSCR   *(unsigned char*)0x5347
-// auto-reload register
-#define TIM4_ARR    *(unsigned char*)0x5348
+#define TICK_PRESCALE_VALUE 3
 
 /**
  * Uptime counter
@@ -32,16 +36,15 @@
  * 32      23       18         12         6         0
  */
 static unsigned long uptime;
+static unsigned char tickPrescaler;
 
 /**
  * @brief Initialize timer's configuration registers and reset uptime.
  */
 void initTimer()
 {
-    // Configure system clock
-//    CLK_DIVR = 0x00;    // Set the frequency to 16 MHz
-//    CLK_PCKENR1 = 0xFF; // Enable peripherals
-    TIM4_PSCR = 0x06;
+    CLK_CKDIVR = 0x00;    // Set the frequency to 16 MHz
+    TIM4_PSCR = 0x07;
     TIM4_IER = 0x01;    // Enable interrupt on update event
     TIM4_CR1 = 0x05;    // Enable timer
     resetUptime();
@@ -52,6 +55,7 @@ void initTimer()
  */
 void resetUptime()
 {
+    tickPrescaler = 0;
     uptime = 0;
 }
 
@@ -109,6 +113,13 @@ unsigned char getUptimeDays()
 void TIM4_UPD_handler() __interrupt (23)
 {
     TIM4_SR &= ~TIM_SR1_UIF; // Reset flag
+    tickPrescaler++;
+
+    if (tickPrescaler < TICK_PRESCALE_VALUE) {
+        return;
+    }
+
+    tickPrescaler = 0;
     uptime++;
 
     // Increment minutes count when 60 seconds have passed.
