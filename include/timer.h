@@ -21,6 +21,7 @@
 void initTimer();
 void resetUptime();
 unsigned long getUptime();
+unsigned int getUptimeTicks();
 unsigned char getUptimeSeconds();
 unsigned char getUptimeMinutes();
 unsigned char getUptimeHours();

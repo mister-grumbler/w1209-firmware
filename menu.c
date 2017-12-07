@@ -25,12 +25,10 @@
 #include "params.h"
 #include "timer.h"
 
-// TODO: these values should be corrected afterwards
-// to correspond more precise to given time intervals.
-#define MENU_AUTOINC_DELAY  1
-#define MENU_1_SEC_PASSED   15
-#define MENU_3_SEC_PASSED   45
-#define MENU_5_SEC_PASSED   90
+#define MENU_1_SEC_PASSED   32
+#define MENU_3_SEC_PASSED   MENU_1_SEC_PASSED * 3
+#define MENU_5_SEC_PASSED   MENU_1_SEC_PASSED * 5
+#define MENU_AUTOINC_DELAY  MENU_1_SEC_PASSED / 8
 
 static unsigned char menuDisplay;
 static unsigned char menuState;
@@ -110,7 +108,6 @@ void feedMenu (unsigned char event)
             break;
         }
     } else if (menuState == MENU_SELECT_PARAM) {
-        // TODO: store into EEPROM on timeout and return to MENU_ROOT
         switch (event) {
         case MENU_EVENT_PUSH_BUTTON1:
             menuState = menuDisplay = MENU_CHANGE_PARAM;
@@ -157,7 +154,6 @@ void feedMenu (unsigned char event)
             break;
         }
     } else if (menuState == MENU_CHANGE_PARAM) {
-        // TODO: store into EEPROM on timeout and return to MENU_ROOT
         switch (event) {
         case MENU_EVENT_PUSH_BUTTON1:
             menuState = menuDisplay = MENU_SELECT_PARAM;
@@ -209,7 +205,6 @@ void feedMenu (unsigned char event)
             break;
         }
     } else if (menuState == MENU_SET_THRESHOLD) {
-        // TODO: on timeout store into EEPROM and return to MENU_ROOT
         switch (event) {
         case MENU_EVENT_PUSH_BUTTON1:
             timer = 0;
@@ -247,7 +242,7 @@ void feedMenu (unsigned char event)
             if (getButton2() || getButton3() ) {
                 blink = false;
             } else {
-                blink = (bool) (getUptime() & 0x40);
+                blink = (bool) ( (unsigned char) getUptimeTicks() & 0x80);
             }
 
             if (timer > MENU_1_SEC_PASSED + MENU_AUTOINC_DELAY) {

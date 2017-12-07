@@ -28,23 +28,34 @@
 #include "menu.h"
 #include "relay.h"
 
-#define TICK_PRESCALE_VALUE 3
+#define TICKS_IN_SECOND     500
+#define BITS_FOR_TICKS      9
+#define BITS_FOR_SECONDS    6
+#define BITS_FOR_MINUTES    6
+#define BITS_FOR_HOURS      5
+#define BITS_FOR_DAYS       6
+#define SECONDS_FIRST_BIT   BITS_FOR_TICKS + 1
+#define MINUTES_FIRST_BIT   BITS_FOR_TICKS + BITS_FOR_SECONDS + 1
+#define HOURS_FIRST_BIT     BITS_FOR_TICKS + BITS_FOR_SECONDS + BITS_FOR_MINUTES + 1
+#define DAYS_FIRST_BIT      BITS_FOR_TICKS + BITS_FOR_SECONDS + BITS_FOR_MINUTES + BITS_FOR_HOURS + 1
+#define BITMASK(L)          ( ~ (0xFFFFFFFF << (L) ) )
+#define NBITMASK(L)         (0xFFFFFFFF << (L) )
 
 /**
  * Uptime counter
  * |--Day--|--Hour--|--Minute--|--Second--|--Ticks--|
- * 32      23       18         12         6         0
+ * 31      26       21         15         9         0
  */
 static unsigned long uptime;
-static unsigned char tickPrescaler;
 
 /**
  * @brief Initialize timer's configuration registers and reset uptime.
  */
 void initTimer()
 {
-    CLK_CKDIVR = 0x00;    // Set the frequency to 16 MHz
-    TIM4_PSCR = 0x07;
+    CLK_CKDIVR = 0x00;  // Set the frequency to 16 MHz
+    TIM4_PSCR = 0x07;   // CLK / 128 = 125KHz
+    TIM4_ARR = 0xFA;    // 125KHz /  250(0xFA) = 500Hz
     TIM4_IER = 0x01;    // Enable interrupt on update event
     TIM4_CR1 = 0x05;    // Enable timer
     resetUptime();
@@ -55,14 +66,13 @@ void initTimer()
  */
 void resetUptime()
 {
-    tickPrescaler = 0;
     uptime = 0;
 }
 
 /**
  * @brief Gets raw value of bit-mapped uptime counter.
  * |--Day--|--Hour--|--Minute--|--Second--|--Ticks--|
- * 32      23       18         12         6         0
+ * 31      26       21         15         9         0
  * @return value of uptime counter.
  */
 unsigned long getUptime()
@@ -71,12 +81,21 @@ unsigned long getUptime()
 }
 
 /**
+ * @brief Gets ticks part of uptime counter.
+ * @return ticks part of uptime.
+ */
+unsigned int getUptimeTicks()
+{
+    return (unsigned int) (uptime & BITMASK (BITS_FOR_TICKS) );
+}
+
+/**
  * @brief Gets seconds part of time being passed since last reset.
  * @return seconds part of uptime.
  */
 unsigned char getUptimeSeconds()
 {
-    return (unsigned char) ( (uptime >> 7) & 0x3F);
+    return (unsigned char) ( (uptime >> SECONDS_FIRST_BIT) & BITMASK (BITS_FOR_SECONDS) );
 }
 
 /**
@@ -85,7 +104,7 @@ unsigned char getUptimeSeconds()
  */
 unsigned char getUptimeMinutes()
 {
-    return (unsigned char) ( (uptime >> 13) & 0x3F);
+    return (unsigned char) ( (uptime >> MINUTES_FIRST_BIT) & BITMASK (BITS_FOR_MINUTES) );
 }
 
 /**
@@ -94,7 +113,7 @@ unsigned char getUptimeMinutes()
  */
 unsigned char getUptimeHours()
 {
-    return (unsigned char) ( (uptime >> 19) & 0x1F);
+    return (unsigned char) ( (uptime >> HOURS_FIRST_BIT) & BITMASK (BITS_FOR_HOURS) );
 }
 
 /**
@@ -103,7 +122,7 @@ unsigned char getUptimeHours()
  */
 unsigned char getUptimeDays()
 {
-    return (unsigned char) ( (uptime >> 24) & 0xFF);
+    return (unsigned char) ( (uptime >> DAYS_FIRST_BIT) & BITMASK (BITS_FOR_DAYS) );
 }
 
 /**
@@ -113,45 +132,40 @@ unsigned char getUptimeDays()
 void TIM4_UPD_handler() __interrupt (23)
 {
     TIM4_SR &= ~TIM_SR1_UIF; // Reset flag
-    tickPrescaler++;
 
-    if (tickPrescaler < TICK_PRESCALE_VALUE) {
-        return;
+    if ( ( (unsigned int) (uptime & BITMASK (BITS_FOR_TICKS) ) ) >= TICKS_IN_SECOND) {
+        uptime &= NBITMASK (SECONDS_FIRST_BIT);
+        uptime += (unsigned long) 1 << SECONDS_FIRST_BIT;
+
+        // Increment minutes count when 60 seconds have passed.
+        if ( ( (unsigned char) (uptime >> SECONDS_FIRST_BIT) & BITMASK (BITS_FOR_SECONDS) ) == 60) {
+            uptime &= NBITMASK (MINUTES_FIRST_BIT);
+            uptime += (unsigned long) 1 << MINUTES_FIRST_BIT;
+        }
+
+        // Increment hours count when 60 minutes have passed.
+        if ( ( (unsigned char) (uptime >> MINUTES_FIRST_BIT) & BITMASK (BITS_FOR_MINUTES) ) == 60) {
+            uptime &= NBITMASK (HOURS_FIRST_BIT);
+            uptime += (unsigned long) 1 << HOURS_FIRST_BIT;
+        }
+
+        // Increment days count when 24 hours have passed.
+        if ( ( (unsigned char) (uptime >> HOURS_FIRST_BIT) & BITMASK (BITS_FOR_HOURS) ) == 24) {
+            uptime &= NBITMASK (DAYS_FIRST_BIT);
+            uptime += (unsigned long) 1 << DAYS_FIRST_BIT;
+        }
     }
 
-    tickPrescaler = 0;
     uptime++;
 
-    // Increment minutes count when 60 seconds have passed.
-    if ( ( (unsigned char) (uptime >> 7) & 0x3F) == 0x3C) { // 60 seconds
-        uptime &= ~0x1EFF;
-        uptime += (unsigned long) 1 << 13;
-    }
-
-    // Increment hours count when 60 minutes have passed.
-    if ( ( (unsigned char) (uptime >> 13) & 0x3F) == 0x3C) { // 60 minutes
-        uptime &= ~0x7FFFF;
-        uptime += (unsigned long) 1 << 19;
-    }
-
-    // Increment days count when 24 hours have passed.
-    if ( ( (unsigned char) (uptime >> 19) & 0x1F) == 0x18) { // 24 hours
-        uptime &= ~0xFFFFFF;
-        uptime += (unsigned long) 1 << 24;
-    }
-
     // Try not to call all refresh functions at once.
-    refreshDisplay();
-
-    if ( ( (unsigned char) uptime & 0x07) == 1) {
+    if ( ( (unsigned char) getUptimeTicks() & 0x0F) == 1) {
         refreshMenu();
-    }
-
-    if ( ( (unsigned char) uptime & 0x3F) == 2) {
+    } else if ( ( (unsigned char) getUptimeTicks() & 0xFF) == 2) {
         startADC();
-    }
-
-    if ( ( (unsigned char) uptime & 0x3F) == 3) {
+    } else if ( ( (unsigned char) getUptimeTicks() & 0xFF) == 3) {
         refreshRelay();
     }
+
+    refreshDisplay();
 }
